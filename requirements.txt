@@ -1,0 +1,15 @@
+# Servidor web e framework
+Flask==3.0.3
+# ORM e integração com banco
+Flask-SQLAlchemy==3.1.1
+# Conector do PostgreSQL para Python
+psycopg2-binary==2.9.9
+# Gerenciador de migrações de banco de dados
+Flask-Migrate==4.0.7
+# Necessário para habilitar requisições do seu React para o Flask (evita erros de CORS)
+Flask-Cors==5.0.0
+# Validação de dados (opcional, mas recomendado)
+pydantic==2.7.1
+pandas
+openpyxl
+xlrd

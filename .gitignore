@@ -1,0 +1,14 @@
+# Pastas do ambiente virtual e cache
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Pastas de banco de dados e migrações (se preferir subir só a estrutura)
+migrations/
+*.sqlite
+*.db
+
+# Docker e arquivos de sistema
+.DS_Store
+.vscode/
