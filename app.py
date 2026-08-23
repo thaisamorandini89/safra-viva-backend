@@ -8,6 +8,7 @@ from controllers.regime_tributario_controller import regime_bp
 from controllers.tipo_empresa_controller import tipo_empresa_bp
 from controllers.tipo_solo_controller import tipo_solo_bp
 from controllers.classe_capacidade_uso_controller import classe_uso_bp
+from controllers.propriedade_controller import propriedade_bp
 
 def create_app():
     app = Flask(__name__)
@@ -38,6 +39,7 @@ app.register_blueprint(regime_bp, url_prefix='/api')
 app.register_blueprint(tipo_empresa_bp, url_prefix='/api')
 app.register_blueprint(tipo_solo_bp, url_prefix='/api')
 app.register_blueprint(classe_uso_bp, url_prefix='/api')
+app.register_blueprint(propriedade_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     # O host 0.0.0.0 é obrigatório dentro de containers Docker
