@@ -12,3 +12,4 @@ from .empresa_agricola import EmpresaAgricola
 from .tipo_solo import TipoSolo
 from .classe_capacidade_uso import ClasseCapacidadeUso
 from .propriedade import Propriedade
+from .talhao import Talhao
