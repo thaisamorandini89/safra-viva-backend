@@ -30,5 +30,35 @@ def criar_empresa():
     except Exception as e:
         return jsonify({"error": "Falha de processamento das informações.", "details": str(e)}), 500
 
+@empresa_bp.route('/empresas-agricolas/<int:id_empresa>', methods=['PUT'])
+def atualizar_empresa(id_empresa):
+    try:
+        dados = request.get_json()
+        if not dados:
+            return jsonify({"error": "Os dados de atualização devem ser fornecidos no formato JSON."}), 400
+
+        empresa = EmpresaAgricolaService.atualizar_empresa(id_empresa, dados)
+
+        return jsonify({
+            "message": "Empresa agrícola atualizada com sucesso!",
+            "id_empresa": empresa.id_empresa,
+            "razao_social": empresa.razao_social
+        }), 200
+    except ValueError as e:
+        status = 404 if "não encontrada" in str(e).lower() else 400
+        return jsonify({"error": str(e)}), status
+    except Exception as e:
+        return jsonify({"error": "Falha ao atualizar a empresa.", "details": str(e)}), 500
+
+@empresa_bp.route('/empresas-agricolas/<int:id_empresa>', methods=['DELETE'])
+def excluir_empresa(id_empresa):
+    try:
+        EmpresaAgricolaService.excluir_empresa(id_empresa)
+        return jsonify({"message": "Empresa agrícola excluída com sucesso!"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": "Falha ao excluir a empresa.", "details": str(e)}), 500
+
 
 
