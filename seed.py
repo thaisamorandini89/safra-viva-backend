@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd # type: ignore
 from app import create_app, db
 from models.estado import Estado
 from models.cidade import Cidade
