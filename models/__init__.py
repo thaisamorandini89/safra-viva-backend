@@ -12,3 +12,9 @@ from .empresa_agricola import EmpresaAgricola
 from .tipo_solo import TipoSolo
 from .classe_capacidade_uso import ClasseCapacidadeUso
 from .propriedade import Propriedade
+from .talhao import Talhao
+from .categoria_insumo import CategoriaInsumo
+from .fabricante import Fabricante
+from .fornecedor import Fornecedor
+from .produto import Produto
+from .insumo import Insumo

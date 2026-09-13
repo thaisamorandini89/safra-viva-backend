@@ -1,0 +1,8 @@
+# services/__init__.py
+
+from .empresa_agricola_service import EmpresaAgricolaService
+from .regime_tributario_service import RegimeTributarioService
+from .tipo_empresa_service import TipoEmpresaService
+from .tipo_solo_service import TipoSoloService
+from .classe_capacidade_uso_service import ClasseCapacidadeUsoService
+from .propriedade_service import PropriedadeService

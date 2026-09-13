@@ -180,3 +180,114 @@ class EmpresaAgricolaService:
 
         return nova_empresa
 
+    @staticmethod
+    def atualizar_empresa(id_empresa, dados):
+        """
+        Atualiza os dados de uma Empresa Agrícola existente.
+        Apenas os campos enviados no payload são alterados.
+        """
+        empresa = EmpresaAgricola.query.get(id_empresa)
+        if not empresa:
+            raise ValueError("Empresa agrícola não encontrada.")
+
+        # Identificação principal
+        if "razao_social" in dados:
+            razao_social = (dados.get("razao_social") or "").strip()
+            if not razao_social:
+                raise ValueError("A Razão Social não pode ficar vazia.")
+            empresa.razao_social = razao_social
+
+        if "email" in dados:
+            email = (dados.get("email") or "").strip()
+            if not email:
+                raise ValueError("O E-mail não pode ficar vazio.")
+            empresa.email = email
+
+        if "cnpj" in dados:
+            cnpj_limpo = ''.join(filter(str.isdigit, str(dados.get("cnpj"))))
+            if len(cnpj_limpo) != 14:
+                raise ValueError("CNPJ inválido. Deve conter 14 dígitos numéricos.")
+            empresa_existente = EmpresaAgricola.query.filter_by(cnpj=cnpj_limpo).first()
+            if empresa_existente and empresa_existente.id_empresa != empresa.id_empresa:
+                raise ValueError("Este CNPJ já está cadastrado no sistema.")
+            empresa.cnpj = cnpj_limpo
+
+        # Demais campos
+        if "nome_fantasia" in dados:
+            empresa.nome_fantasia = (dados.get("nome_fantasia") or "").strip() or None
+        if "inscricao_estadual" in dados:
+            empresa.inscricao_estadual = (dados.get("inscricao_estadual") or "").strip() or None
+        if "inscricao_municipal" in dados:
+            empresa.inscricao_municipal = (dados.get("inscricao_municipal") or "").strip() or None
+        if "telefone" in dados:
+            empresa.telefone = (dados.get("telefone") or "").strip() or None
+        if "website" in dados:
+            empresa.website = (dados.get("website") or "").strip() or None
+        if "data_fundacao" in dados:
+            empresa.data_fundacao = dados.get("data_fundacao") or None
+        if "id_tipo_empresa" in dados:
+            empresa.id_tipo_empresa = dados.get("id_tipo_empresa") or None
+        if "id_regime_tributario" in dados:
+            empresa.id_regime_tributario = dados.get("id_regime_tributario") or None
+        if "status" in dados:
+            empresa.status = bool(dados.get("status"))
+
+        # Endereço (opcional) — cria novo logradouro se dados completos forem enviados
+        cep = dados.get("cep")
+        id_cidade = dados.get("id_cidade") or dados.get("cidade_id") or dados.get("id_municipio")
+        nome_bairro = dados.get("bairro")
+        logradouro_nome = dados.get("logradouro")
+
+        if cep and id_cidade and nome_bairro and logradouro_nome:
+            cep_limpo = ''.join(filter(str.isdigit, str(cep)))
+
+            cidade = Cidade.query.get(id_cidade)
+            if not cidade:
+                raise ValueError("Cidade informada não foi encontrada no banco de dados.")
+
+            bairro = Bairro.query.filter_by(
+                nome_bairro=nome_bairro.strip(),
+                id_cidade=id_cidade
+            ).first()
+            if not bairro:
+                bairro = Bairro(nome_bairro=nome_bairro.strip(), id_cidade=id_cidade)
+                db.session.add(bairro)
+                db.session.flush()
+
+            logr = Logradouro(
+                cep=cep_limpo,
+                logradouro=logradouro_nome.strip(),
+                numero=(dados.get("numero") or "").strip() or None,
+                complemento=(dados.get("complemento") or "").strip() or None,
+                id_bairro=bairro.id_bairro
+            )
+            db.session.add(logr)
+            db.session.flush()
+            empresa.id_logradouro = logr.id_logradouro
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError(f"Erro ao atualizar a empresa no banco de dados: {str(e)}")
+
+        return empresa
+
+    @staticmethod
+    def excluir_empresa(id_empresa):
+        """
+        Exclui uma Empresa Agrícola pelo seu id.
+        """
+        empresa = EmpresaAgricola.query.get(id_empresa)
+        if not empresa:
+            raise ValueError("Empresa agrícola não encontrada.")
+
+        db.session.delete(empresa)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError(f"Erro ao excluir a empresa no banco de dados: {str(e)}")
+
+        return True
+
