@@ -1,0 +1,362 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-09-03T00:00:00.000Z",
+  "__export_source": "safraviva.backend",
+  "resources": [
+    {
+      "_id": "wrk_safraviva",
+      "_type": "workspace",
+      "name": "SafraViva",
+      "description": "Coleção de endpoints do backend SafraViva, organizada por regra de negócio.",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_safraviva",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:5000/api"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url"]
+      },
+      "metaSortKey": 1
+    },
+
+    {
+      "_id": "fld_geo",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Geografia (Estados / Cidades)",
+      "metaSortKey": -1000
+    },
+    {
+      "_id": "req_geo_estados",
+      "_type": "request",
+      "parentId": "fld_geo",
+      "name": "Listar Estados",
+      "method": "GET",
+      "url": "{{ _.base_url }}/estados",
+      "metaSortKey": -1000
+    },
+    {
+      "_id": "req_geo_cidades",
+      "_type": "request",
+      "parentId": "fld_geo",
+      "name": "Listar Cidades por Estado",
+      "method": "GET",
+      "url": "{{ _.base_url }}/estados/1/cidades",
+      "metaSortKey": -990
+    },
+
+    {
+      "_id": "fld_tipo_empresa",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Tipo de Empresa",
+      "metaSortKey": -900
+    },
+    {
+      "_id": "req_tipo_empresa_list",
+      "_type": "request",
+      "parentId": "fld_tipo_empresa",
+      "name": "Listar Tipos de Empresa",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tipos-empresa",
+      "metaSortKey": -900
+    },
+    {
+      "_id": "req_tipo_empresa_create",
+      "_type": "request",
+      "parentId": "fld_tipo_empresa",
+      "name": "Cadastrar Tipo de Empresa",
+      "method": "POST",
+      "url": "{{ _.base_url }}/tipos-empresa",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao\": \"Produtor Rural\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -890
+    },
+
+    {
+      "_id": "fld_regime",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Regime Tributário",
+      "metaSortKey": -800
+    },
+    {
+      "_id": "req_regime_list",
+      "_type": "request",
+      "parentId": "fld_regime",
+      "name": "Listar Regimes Tributários",
+      "method": "GET",
+      "url": "{{ _.base_url }}/regimes-tributarios",
+      "metaSortKey": -800
+    },
+    {
+      "_id": "req_regime_create",
+      "_type": "request",
+      "parentId": "fld_regime",
+      "name": "Cadastrar Regime Tributário",
+      "method": "POST",
+      "url": "{{ _.base_url }}/regimes-tributarios",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao\": \"Simples Nacional\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -790
+    },
+
+    {
+      "_id": "fld_tipo_solo",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Tipo de Solo",
+      "metaSortKey": -700
+    },
+    {
+      "_id": "req_tipo_solo_list",
+      "_type": "request",
+      "parentId": "fld_tipo_solo",
+      "name": "Listar Tipos de Solo",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tipos-solo",
+      "metaSortKey": -700
+    },
+    {
+      "_id": "req_tipo_solo_create",
+      "_type": "request",
+      "parentId": "fld_tipo_solo",
+      "name": "Cadastrar Tipo de Solo",
+      "method": "POST",
+      "url": "{{ _.base_url }}/tipos-solo",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao\": \"Latossolo Vermelho\",\n  \"sigla\": \"LV\",\n  \"classe_textural\": \"Argilosa\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -690
+    },
+
+    {
+      "_id": "fld_classe_uso",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Classe de Capacidade de Uso",
+      "metaSortKey": -600
+    },
+    {
+      "_id": "req_classe_uso_list",
+      "_type": "request",
+      "parentId": "fld_classe_uso",
+      "name": "Listar Classes de Uso",
+      "method": "GET",
+      "url": "{{ _.base_url }}/classes-uso",
+      "metaSortKey": -600
+    },
+    {
+      "_id": "req_classe_uso_create",
+      "_type": "request",
+      "parentId": "fld_classe_uso",
+      "name": "Cadastrar Classe de Uso",
+      "method": "POST",
+      "url": "{{ _.base_url }}/classes-uso",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"sigla\": \"I\",\n  \"descricao\": \"Terras cultivaveis sem restricoes\",\n  \"aptidao_principal\": \"Culturas anuais\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -590
+    },
+
+    {
+      "_id": "fld_empresa",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Empresa Agrícola",
+      "metaSortKey": -500
+    },
+    {
+      "_id": "req_empresa_list",
+      "_type": "request",
+      "parentId": "fld_empresa",
+      "name": "Listar Empresas Agrícolas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/empresas-agricolas",
+      "metaSortKey": -500
+    },
+    {
+      "_id": "req_empresa_create",
+      "_type": "request",
+      "parentId": "fld_empresa",
+      "name": "Cadastrar Empresa Agrícola",
+      "method": "POST",
+      "url": "{{ _.base_url }}/empresas-agricolas",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"razao_social\": \"Agropecuaria Boa Vista LTDA\",\n  \"nome_fantasia\": \"Fazenda Boa Vista\",\n  \"cnpj\": \"12345678000199\",\n  \"inscricao_estadual\": \"1234567890\",\n  \"telefone\": \"66999998888\",\n  \"email\": \"contato@boavista.com.br\",\n  \"id_tipo_empresa\": 1,\n  \"id_regime_tributario\": 1,\n  \"cep\": \"78550000\",\n  \"id_cidade\": 1,\n  \"logradouro\": \"Rodovia BR-163 KM 100\",\n  \"numero\": \"S/N\",\n  \"bairro\": \"Zona Rural\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -490
+    },
+
+    {
+      "_id": "fld_propriedade",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Propriedade",
+      "metaSortKey": -400
+    },
+    {
+      "_id": "req_prop_list",
+      "_type": "request",
+      "parentId": "fld_propriedade",
+      "name": "Listar Propriedades",
+      "method": "GET",
+      "url": "{{ _.base_url }}/propriedades",
+      "metaSortKey": -400
+    },
+    {
+      "_id": "req_prop_get",
+      "_type": "request",
+      "parentId": "fld_propriedade",
+      "name": "Buscar Propriedade por ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/propriedades/1",
+      "metaSortKey": -395
+    },
+    {
+      "_id": "req_prop_create",
+      "_type": "request",
+      "parentId": "fld_propriedade",
+      "name": "Cadastrar Propriedade",
+      "method": "POST",
+      "url": "{{ _.base_url }}/propriedades",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome_propriedade\": \"Fazenda Boa Vista\",\n  \"id_empresa\": 1,\n  \"car\": \"MT-1234567-ABCDEF\",\n  \"ccir\": \"1234567890\",\n  \"nirf\": \"9876543\",\n  \"latitude\": -12.64,\n  \"longitude\": -55.72,\n  \"area_total\": 1500.00,\n  \"area_agricultavel\": 1200.00,\n  \"area_preservacao\": 300.00,\n  \"area_pastagem\": 100.00,\n  \"area_vegetacao_nativa\": 200.00,\n  \"altitude_media\": 450,\n  \"id_tipo_solo\": 1,\n  \"id_classe_capacidade_uso\": 1,\n  \"ponto_referencia\": \"Proximo ao Rio Teles Pires\",\n  \"observacoes\": \"Propriedade com irrigacao por pivo central.\",\n  \"cep\": \"78550000\",\n  \"id_cidade\": 1,\n  \"logradouro\": \"Rodovia BR-163 KM 100\",\n  \"bairro\": \"Zona Rural\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -390
+    },
+    {
+      "_id": "req_prop_update",
+      "_type": "request",
+      "parentId": "fld_propriedade",
+      "name": "Atualizar Propriedade (Parcial)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/propriedades/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"observacoes\": \"Atualizacao: nova area de plantio adicionada.\",\n  \"area_agricultavel\": 1250.00\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -385
+    },
+    {
+      "_id": "req_prop_delete",
+      "_type": "request",
+      "parentId": "fld_propriedade",
+      "name": "Excluir Propriedade",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/propriedades/1",
+      "metaSortKey": -380
+    },
+
+    {
+      "_id": "fld_talhao",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Talhão",
+      "metaSortKey": -300
+    },
+    {
+      "_id": "req_talhao_list",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Listar Talhões",
+      "method": "GET",
+      "url": "{{ _.base_url }}/talhoes",
+      "metaSortKey": -300
+    },
+    {
+      "_id": "req_talhao_by_prop",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Listar Talhões por Propriedade",
+      "method": "GET",
+      "url": "{{ _.base_url }}/propriedades/2/talhoes",
+      "metaSortKey": -295
+    },
+    {
+      "_id": "req_talhao_get",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Buscar Talhão por ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/talhoes/1",
+      "metaSortKey": -290
+    },
+    {
+      "_id": "req_talhao_create",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Cadastrar Talhão",
+      "method": "POST",
+      "url": "{{ _.base_url }}/talhoes",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome_talhao\": \"Talhao Boa Vista\",\n  \"codigo_talhao\": \"TLH-001\",\n  \"id_propriedade\": 2,\n  \"area_total\": 120.50,\n  \"area_utilizavel\": 110.00,\n  \"status_inicial\": \"Livre\",\n  \"id_tipo_solo\": 1,\n  \"topografia\": \"Plano\",\n  \"observacoes\": \"Area com boa drenagem, sem restricoes.\",\n  \"latitude\": -12.64,\n  \"longitude\": -55.72\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -285
+    },
+    {
+      "_id": "req_talhao_update",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Atualizar Talhão (Parcial)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/talhoes/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status_inicial\": \"Ocupado\",\n  \"topografia\": \"Ondulado\",\n  \"area_utilizavel\": 115.00,\n  \"observacoes\": \"Plantio de soja iniciado na safra 2026.\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -280
+    },
+    {
+      "_id": "req_talhao_delete",
+      "_type": "request",
+      "parentId": "fld_talhao",
+      "name": "Excluir Talhão",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/talhoes/1",
+      "metaSortKey": -275
+    }
+  ]
+}

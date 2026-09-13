@@ -10,6 +10,11 @@ from controllers.tipo_solo_controller import tipo_solo_bp
 from controllers.classe_capacidade_uso_controller import classe_uso_bp
 from controllers.propriedade_controller import propriedade_bp
 from controllers.talhao_controller import talhao_bp
+from controllers.categoria_insumo_controller import categoria_insumo_bp
+from controllers.fabricante_controller import fabricante_bp
+from controllers.fornecedor_controller import fornecedor_bp
+from controllers.produto_controller import produto_bp
+from controllers.insumo_controller import insumo_bp
 
 def create_app():
     app = Flask(__name__)
@@ -42,6 +47,11 @@ app.register_blueprint(tipo_solo_bp, url_prefix='/api')
 app.register_blueprint(classe_uso_bp, url_prefix='/api')
 app.register_blueprint(propriedade_bp, url_prefix='/api')
 app.register_blueprint(talhao_bp, url_prefix='/api')
+app.register_blueprint(categoria_insumo_bp, url_prefix='/api')
+app.register_blueprint(fabricante_bp, url_prefix='/api')
+app.register_blueprint(fornecedor_bp, url_prefix='/api')
+app.register_blueprint(produto_bp, url_prefix='/api')
+app.register_blueprint(insumo_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     # O host 0.0.0.0 é obrigatório dentro de containers Docker
