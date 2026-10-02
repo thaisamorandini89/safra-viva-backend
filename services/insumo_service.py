@@ -2,6 +2,8 @@ from models import db
 from models.insumo import Insumo
 from models.produto import Produto
 from models.categoria_insumo import CategoriaInsumo
+from models.fabricante import Fabricante
+from models.marca import Marca
 
 
 class InsumoService:
@@ -23,6 +25,18 @@ class InsumoService:
                 if cat:
                     categoria_nome = cat.nome_categoria
 
+            fabricante_nome = ""
+            if produto and produto.id_fabricante:
+                fab = Fabricante.query.get(produto.id_fabricante)
+                if fab:
+                    fabricante_nome = fab.nome_fabricante
+
+            descricao_marca = ""
+            if produto and produto.id_marca:
+                mar = Marca.query.get(produto.id_marca)
+                if mar:
+                    descricao_marca = mar.descricao_marca
+
             resultado.append({
                 "id_insumo": ins.id_insumo,
                 "id_produto": ins.id_produto,
@@ -30,8 +44,10 @@ class InsumoService:
                 "id_categoria_insumo": produto.id_categoria_insumo if produto else None,
                 "categoria_nome": categoria_nome,
                 "unidade_medida": produto.unidade_medida if produto else "",
-                "fabricante": produto.fabricante if produto else "",
-                "marca": produto.marca if produto else "",
+                "id_fabricante": produto.id_fabricante if produto else None,
+                "fabricante_nome": fabricante_nome,
+                "id_marca": produto.id_marca if produto else None,
+                "descricao_marca": descricao_marca,
                 "estoque_atual": float(ins.estoque_atual) if ins.estoque_atual is not None else 0,
                 "estoque_minimo": float(ins.estoque_minimo) if ins.estoque_minimo is not None else 0,
                 "valor_unitario": float(ins.valor_unitario) if ins.valor_unitario is not None else 0,

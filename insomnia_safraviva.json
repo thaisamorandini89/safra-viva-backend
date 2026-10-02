@@ -357,6 +357,131 @@
       "method": "DELETE",
       "url": "{{ _.base_url }}/talhoes/1",
       "metaSortKey": -275
+    },
+
+    {
+      "_id": "fld_marca",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Marcas",
+      "metaSortKey": -270
+    },
+    {
+      "_id": "req_marca_list",
+      "_type": "request",
+      "parentId": "fld_marca",
+      "name": "Listar Marcas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/marcas",
+      "metaSortKey": -270
+    },
+    {
+      "_id": "req_marca_create",
+      "_type": "request",
+      "parentId": "fld_marca",
+      "name": "Cadastrar Marca",
+      "method": "POST",
+      "url": "{{ _.base_url }}/marcas",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao_marca\": \"Bayer\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -265
+    },
+    {
+      "_id": "req_marca_update",
+      "_type": "request",
+      "parentId": "fld_marca",
+      "name": "Atualizar Marca",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/marcas/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao_marca\": \"Bayer CropScience\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -260
+    },
+    {
+      "_id": "req_marca_delete",
+      "_type": "request",
+      "parentId": "fld_marca",
+      "name": "Excluir Marca",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/marcas/1",
+      "metaSortKey": -255
+    },
+
+    {
+      "_id": "fld_insumo",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Insumos (Estoque)",
+      "metaSortKey": -250
+    },
+    {
+      "_id": "req_insumo_list",
+      "_type": "request",
+      "parentId": "fld_insumo",
+      "name": "Listar Insumos",
+      "method": "GET",
+      "url": "{{ _.base_url }}/insumos",
+      "metaSortKey": -250
+    },
+    {
+      "_id": "req_insumo_create",
+      "_type": "request",
+      "parentId": "fld_insumo",
+      "name": "Cadastrar Insumo (Estoque)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/insumos",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"id_produto\": 1,\n  \"estoque_atual\": 320,\n  \"estoque_minimo\": 80,\n  \"valor_unitario\": 195.00\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -245
+    },
+    {
+      "_id": "req_insumo_get",
+      "_type": "request",
+      "parentId": "fld_insumo",
+      "name": "Buscar Insumo por ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/insumos/1",
+      "metaSortKey": -240
+    },
+    {
+      "_id": "req_insumo_update",
+      "_type": "request",
+      "parentId": "fld_insumo",
+      "name": "Atualizar Insumo (Parcial)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/insumos/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"estoque_atual\": 300,\n  \"estoque_minimo\": 100,\n  \"valor_unitario\": 198.50\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -235
+    },
+    {
+      "_id": "req_insumo_delete",
+      "_type": "request",
+      "parentId": "fld_insumo",
+      "name": "Excluir Insumo",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/insumos/1",
+      "metaSortKey": -230
     }
   ]
 }
