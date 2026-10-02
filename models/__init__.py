@@ -19,3 +19,5 @@ from .fornecedor import Fornecedor
 from .produto import Produto
 from .insumo import Insumo
 from .marca import Marca
+from .responsavel import Responsavel
+from .movimentacao_estoque import MovimentacaoEstoque
