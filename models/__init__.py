@@ -18,3 +18,4 @@ from .fabricante import Fabricante
 from .fornecedor import Fornecedor
 from .produto import Produto
 from .insumo import Insumo
+from .marca import Marca

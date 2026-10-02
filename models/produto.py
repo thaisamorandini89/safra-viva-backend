@@ -18,7 +18,8 @@ class Produto(db.Model):
     # Dados Comerciais (vinculados a cadastros próprios)
     id_fabricante = db.Column(db.Integer, db.ForeignKey('fabricante.id_fabricante'), nullable=True)
     id_fornecedor = db.Column(db.Integer, db.ForeignKey('fornecedor.id_fornecedor'), nullable=True)
-    marca = db.Column(db.String(150), nullable=True)
+    id_marca = db.Column(db.Integer, db.ForeignKey('marca.id_marca'), nullable=True)
+    marca_rel = db.relationship('Marca', backref='produtos', lazy='joined')
 
     # Informações Complementares
     registro_mapa = db.Column(db.String(60), nullable=True)

@@ -3,6 +3,7 @@ from models.produto import Produto
 from models.categoria_insumo import CategoriaInsumo
 from models.fabricante import Fabricante
 from models.fornecedor import Fornecedor
+from models.marca import Marca
 
 
 class ProdutoService:
@@ -34,6 +35,12 @@ class ProdutoService:
                 if forn:
                     fornecedor_nome = forn.nome_fantasia or forn.nome_fornecedor
 
+            descricao_marca = None
+            if prod.id_marca:
+                mar = Marca.query.get(prod.id_marca)
+                if mar:
+                    descricao_marca = mar.descricao_marca
+
             resultado.append({
                 "id_produto": prod.id_produto,
                 "nome_produto": prod.nome_produto,
@@ -45,7 +52,8 @@ class ProdutoService:
                 "fabricante_nome": fabricante_nome,
                 "id_fornecedor": prod.id_fornecedor,
                 "fornecedor_nome": fornecedor_nome,
-                "marca": prod.marca,
+                "id_marca": prod.id_marca,
+                "descricao_marca": descricao_marca,
                 "registro_mapa": prod.registro_mapa,
                 "ficha_tecnica": prod.ficha_tecnica,
                 "observacoes": prod.observacoes,
@@ -96,6 +104,9 @@ class ProdutoService:
         id_fornecedor = dados.get("id_fornecedor") or None
         if id_fornecedor and not Fornecedor.query.get(id_fornecedor):
             raise ValueError("Fornecedor informado não foi encontrado.")
+        id_marca = dados.get("id_marca") or None
+        if id_marca and not Marca.query.get(id_marca):
+            raise ValueError("Marca informada não foi encontrada.")
 
         novo_produto = Produto(
             nome_produto=nome.strip(),
@@ -104,7 +115,7 @@ class ProdutoService:
             unidade_medida=unidade.strip(),
             id_fabricante=id_fabricante,
             id_fornecedor=id_fornecedor,
-            marca=(dados.get("marca") or "").strip() or None,
+            id_marca=id_marca,
             registro_mapa=(dados.get("registro_mapa") or "").strip() or None,
             ficha_tecnica=(dados.get("ficha_tecnica") or "").strip() or None,
             observacoes=(dados.get("observacoes") or "").strip() or None
@@ -159,8 +170,11 @@ class ProdutoService:
             if id_forn and not Fornecedor.query.get(id_forn):
                 raise ValueError("Fornecedor informado não foi encontrado.")
             prod.id_fornecedor = id_forn
-        if "marca" in dados:
-            prod.marca = (dados.get("marca") or "").strip() or None
+        if "id_marca" in dados:
+            id_mar = dados.get("id_marca") or None
+            if id_mar and not Marca.query.get(id_mar):
+                raise ValueError("Marca informada não foi encontrada.")
+            prod.id_marca = id_mar
         if "registro_mapa" in dados:
             prod.registro_mapa = (dados.get("registro_mapa") or "").strip() or None
         if "ficha_tecnica" in dados:
