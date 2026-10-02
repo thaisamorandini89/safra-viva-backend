@@ -482,6 +482,97 @@
       "method": "DELETE",
       "url": "{{ _.base_url }}/insumos/1",
       "metaSortKey": -230
+    },
+
+    {
+      "_id": "fld_responsavel",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Responsáveis",
+      "metaSortKey": -225
+    },
+    {
+      "_id": "req_resp_list",
+      "_type": "request",
+      "parentId": "fld_responsavel",
+      "name": "Listar Responsáveis",
+      "method": "GET",
+      "url": "{{ _.base_url }}/responsaveis",
+      "metaSortKey": -225
+    },
+    {
+      "_id": "req_resp_create",
+      "_type": "request",
+      "parentId": "fld_responsavel",
+      "name": "Cadastrar Responsável",
+      "method": "POST",
+      "url": "{{ _.base_url }}/responsaveis",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"João da Silva\",\n  \"cargo\": \"Almoxarife\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -220
+    },
+
+    {
+      "_id": "fld_movimentacao",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Movimentações de Estoque",
+      "metaSortKey": -215
+    },
+    {
+      "_id": "req_mov_list",
+      "_type": "request",
+      "parentId": "fld_movimentacao",
+      "name": "Listar Movimentações",
+      "method": "GET",
+      "url": "{{ _.base_url }}/movimentacoes",
+      "metaSortKey": -215
+    },
+    {
+      "_id": "req_mov_list_filtro",
+      "_type": "request",
+      "parentId": "fld_movimentacao",
+      "name": "Listar Movimentações por Insumo",
+      "method": "GET",
+      "url": "{{ _.base_url }}/movimentacoes?id_insumo=1",
+      "metaSortKey": -210
+    },
+    {
+      "_id": "req_mov_entrada",
+      "_type": "request",
+      "parentId": "fld_movimentacao",
+      "name": "Registrar Entrada",
+      "method": "POST",
+      "url": "{{ _.base_url }}/movimentacoes",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"id_insumo\": 1,\n  \"tipo_movimentacao\": \"ENTRADA\",\n  \"quantidade\": 50,\n  \"id_responsavel\": 1,\n  \"observacao\": \"Compra NF 123\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -205
+    },
+    {
+      "_id": "req_mov_saida",
+      "_type": "request",
+      "parentId": "fld_movimentacao",
+      "name": "Registrar Saída",
+      "method": "POST",
+      "url": "{{ _.base_url }}/movimentacoes",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"id_insumo\": 1,\n  \"tipo_movimentacao\": \"SAIDA\",\n  \"quantidade\": 30,\n  \"id_responsavel\": 1,\n  \"observacao\": \"Aplicação no talhão 1\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -200
     }
   ]
 }
