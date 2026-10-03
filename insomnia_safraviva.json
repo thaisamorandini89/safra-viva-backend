@@ -573,6 +573,116 @@
         { "name": "Content-Type", "value": "application/json" }
       ],
       "metaSortKey": -200
+    },
+
+    {
+      "_id": "fld_funcionario",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Funcionários",
+      "metaSortKey": -195
+    },
+    {
+      "_id": "req_func_list",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Listar Funcionários",
+      "method": "GET",
+      "url": "{{ _.base_url }}/funcionarios",
+      "metaSortKey": -195
+    },
+    {
+      "_id": "req_func_list_filtro",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Listar Funcionários (filtros)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/funcionarios?nome=&cpf=&cargo=&id_propriedade=&status=ativo",
+      "metaSortKey": -194
+    },
+    {
+      "_id": "req_func_indicadores",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Indicadores (Dashboard)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/funcionarios/indicadores",
+      "metaSortKey": -193
+    },
+    {
+      "_id": "req_func_create",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Cadastrar Funcionário",
+      "method": "POST",
+      "url": "{{ _.base_url }}/funcionarios",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome_completo\": \"João da Silva\",\n  \"cpf\": \"123.456.789-00\",\n  \"rg\": \"12.345.678-9\",\n  \"data_nascimento\": \"1990-05-20\",\n  \"telefone\": \"(11) 98888-7777\",\n  \"email\": \"joao.silva@fazenda.com\",\n  \"cargo\": \"Operador de Máquinas\",\n  \"data_admissao\": \"2024-01-10\",\n  \"observacoes\": \"Colaborador do turno da manhã.\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -192
+    },
+    {
+      "_id": "req_func_get",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Buscar Funcionário por ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI",
+      "metaSortKey": -191
+    },
+    {
+      "_id": "req_func_update",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Atualizar Funcionário",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cargo\": \"Encarregado de Campo\",\n  \"telefone\": \"(11) 97777-6666\"\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -190
+    },
+    {
+      "_id": "req_func_inativar",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Inativar Funcionário",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI",
+      "metaSortKey": -189
+    },
+    {
+      "_id": "req_func_vincular_prop",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Vincular Propriedade",
+      "method": "POST",
+      "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI/propriedades",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"id_propriedade\": 1\n}"
+      },
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "metaSortKey": -188
+    },
+    {
+      "_id": "req_func_list_prop",
+      "_type": "request",
+      "parentId": "fld_funcionario",
+      "name": "Listar Propriedades do Funcionário",
+      "method": "GET",
+      "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI/propriedades",
+      "metaSortKey": -187
     }
   ]
 }

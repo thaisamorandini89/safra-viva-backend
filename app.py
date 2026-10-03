@@ -18,6 +18,7 @@ from controllers.insumo_controller import insumo_bp
 from controllers.marca_controller import marca_bp
 from controllers.responsavel_controller import responsavel_bp
 from controllers.movimentacao_controller import movimentacao_bp
+from controllers.funcionario_controller import funcionario_bp
 
 def create_app():
     app = Flask(__name__)
@@ -58,6 +59,7 @@ app.register_blueprint(insumo_bp, url_prefix='/api')
 app.register_blueprint(marca_bp, url_prefix='/api')
 app.register_blueprint(responsavel_bp, url_prefix='/api')
 app.register_blueprint(movimentacao_bp, url_prefix='/api')
+app.register_blueprint(funcionario_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     # O host 0.0.0.0 é obrigatório dentro de containers Docker
