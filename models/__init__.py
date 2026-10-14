@@ -23,3 +23,7 @@ from .responsavel import Responsavel
 from .movimentacao_estoque import MovimentacaoEstoque
 from .funcionario import Funcionario
 from .funcionario_propriedade import FuncionarioPropriedade
+from .safra import Safra
+from .centro_custo import CentroCusto
+from .lancamento_financeiro import LancamentoFinanceiro
+from .rateio_lancamento import RateioLancamento

@@ -19,6 +19,10 @@ from controllers.marca_controller import marca_bp
 from controllers.responsavel_controller import responsavel_bp
 from controllers.movimentacao_controller import movimentacao_bp
 from controllers.funcionario_controller import funcionario_bp
+from controllers.safra_controller import safra_bp
+from controllers.centro_custo_controller import centro_custo_bp
+from controllers.lancamento_controller import lancamento_bp
+from controllers.financeiro_controller import financeiro_bp
 
 def create_app():
     app = Flask(__name__)
@@ -60,6 +64,10 @@ app.register_blueprint(marca_bp, url_prefix='/api')
 app.register_blueprint(responsavel_bp, url_prefix='/api')
 app.register_blueprint(movimentacao_bp, url_prefix='/api')
 app.register_blueprint(funcionario_bp, url_prefix='/api')
+app.register_blueprint(safra_bp, url_prefix='/api')
+app.register_blueprint(centro_custo_bp, url_prefix='/api')
+app.register_blueprint(lancamento_bp, url_prefix='/api')
+app.register_blueprint(financeiro_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     # O host 0.0.0.0 é obrigatório dentro de containers Docker
