@@ -9,8 +9,19 @@ O sistema SHALL persistir movimentações na tabela `movimentacao_estoque` com:
 para `insumo.id_insumo`), `tipo_movimentacao` ('ENTRADA' ou 'SAIDA',
 obrigatório), `quantidade` (Numeric(10,2), obrigatório e positivo),
 `data_movimentacao` (DateTime, preenchida pelo banco),
-`id_responsavel` (FK opcional para `responsavel.id_responsavel`) e
-`observacao` (String(500), opcional).
+`id_funcionario` (String(36), FK opcional para `funcionario.id_funcionario`;
+obrigatório na interface), `observacao` (String(500), opcional) e
+`valor_unitario` (Numeric(14,2), opcional).
+
+A movimentação SHALL suportar campos de detalhe condicionais, todos opcionais
+no banco (`nullable=True`):
+
+- Dados da Entrada: `id_fornecedor` (FK para `fornecedor.id_fornecedor`),
+  `numero_nota_fiscal` (String(50)), `numero_lote` (String(50)),
+  `data_fabricacao` (Date) e `data_validade` (Date).
+- Destino e Rastreabilidade (Saída): `id_talhao` (FK para `talhao.id_talhao`),
+  `safra` (String(20)), `id_atividade` (FK para `atividade.id_atividade`) e
+  `destino_finalidade` (String(255)).
 
 #### Scenario: Tabela criada por migration
 
@@ -58,7 +69,7 @@ saldo for insuficiente.
 
 O sistema SHALL validar o payload com schema Pydantic, rejeitando com HTTP 400:
 tipo diferente de ENTRADA/SAIDA, quantidade ausente, zero ou negativa, insumo
-inexistente e responsável informado inexistente.
+inexistente e funcionário informado inexistente.
 
 #### Scenario: Tipo inválido
 
@@ -76,17 +87,69 @@ inexistente e responsável informado inexistente.
 - **WHEN** um `POST /api/movimentacoes` referencia um `id_insumo` inexistente
 - **THEN** a resposta é HTTP 400 e nada é persistido
 
-#### Scenario: Responsável opcional
+#### Scenario: Funcionário opcional
 
-- **WHEN** um `POST /api/movimentacoes` é enviado sem `id_responsavel`
-- **THEN** a movimentação é registrada normalmente com responsável nulo
+- **WHEN** um `POST /api/movimentacoes` é enviado sem `id_funcionario`
+- **THEN** a movimentação é registrada normalmente com funcionário nulo
+
+### Requirement: Detalhes condicionais por tipo de movimentação
+
+O sistema SHALL aceitar os campos de detalhe de entrada
+(`id_fornecedor`, `numero_nota_fiscal`, `numero_lote`, `data_fabricacao`,
+`data_validade`) apenas em movimentações ENTRADA, e os campos de destino e
+rastreabilidade (`id_talhao`, `safra`, `id_atividade`,
+`destino_finalidade`) apenas em movimentações SAIDA, rejeitando com HTTP 400 o
+envio cruzado. `id_fornecedor`, `id_talhao` e `id_atividade`, quando
+informados, SHALL referenciar registros existentes.
+
+#### Scenario: Entrada com dados completos
+
+- **WHEN** um `POST /api/movimentacoes` ENTRADA é enviado com fornecedor,
+  nota fiscal, lote e datas de fabricação/validade
+- **THEN** a movimentação é persistida com todos os campos informados
+- **AND** a resposta é HTTP 201 contendo os detalhes da entrada
+
+#### Scenario: Saída com destino e rastreabilidade
+
+- **WHEN** um `POST /api/movimentacoes` SAIDA é enviado com talhão, safra,
+  atividade relacionada e destino/finalidade
+- **THEN** a movimentação é persistida com todos os campos informados
+- **AND** a resposta é HTTP 201 contendo os detalhes da saída
+
+#### Scenario: Campo de entrada em uma SAIDA
+
+- **WHEN** um `POST /api/movimentacoes` SAIDA inclui qualquer campo de entrada
+  (ex.: `numero_nota_fiscal`)
+- **THEN** nada é persistido
+- **AND** a resposta é HTTP 400 indicando o campo não permitido para o tipo
+
+#### Scenario: Campo de saída em uma ENTRADA
+
+- **WHEN** um `POST /api/movimentacoes` ENTRADA inclui qualquer campo de saída
+  (ex.: `id_talhao`)
+- **THEN** nada é persistido
+- **AND** a resposta é HTTP 400 indicando o campo não permitido para o tipo
+
+#### Scenario: Validade anterior à fabricação
+
+- **WHEN** uma ENTRADA informa `data_validade` anterior a `data_fabricacao`
+- **THEN** nada é persistido
+- **AND** a resposta é HTTP 400
+
+#### Scenario: Fornecedor, talhão ou atividade inexistente
+
+- **WHEN** a movimentação referencia `id_fornecedor`, `id_talhao` ou
+  `id_atividade` inexistente
+- **THEN** nada é persistido
+- **AND** a resposta é HTTP 400
 
 ### Requirement: Histórico de movimentações
 
 O sistema SHALL expor `GET /api/movimentacoes` retornando o histórico ordenado
 por `data_movimentacao` decrescente, com suporte ao filtro por insumo via
-query param `id_insumo`, incluindo em cada item os dados do insumo/produto e o
-nome do responsável (quando houver).
+query param `id_insumo`, incluindo em cada item os dados do insumo/produto, o
+nome do funcionário, o nome do fornecedor/talhão e a descrição da atividade
+(quando houver).
 
 #### Scenario: Listagem completa
 

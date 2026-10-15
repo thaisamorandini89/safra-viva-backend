@@ -44,10 +44,39 @@ service. Precisão monetária: `quantidade` tipada como `Decimal`, `gt=0`.
 `Literal['ENTRADA','SAIDA']`), sem `ENUM` nativo do PostgreSQL — evita o atrito
 de migrations para alterar enums no futuro.
 
-### Responsável mínimo
+### Responsável = Funcionário (substituição da entidade provisória)
 
-Apenas `GET`/`POST /api/responsaveis`, o suficiente para criar e vincular.
-CRUD completo fica para uma change futura.
+A entidade `Responsavel` foi criada quando não havia cadastro de pessoas; com
+o módulo de Funcionários entregue, manter as duas geraria cadastro duplicado.
+Decisão: a movimentação referencia `funcionario.id_funcionario` e a entidade
+`Responsavel` é removida por completo (modelo, tabela, serviço, controller e
+rotas). Como a tabela `responsavel` está vazia em produção e o endpoint foi
+lançado há poucos dias, a remoção direta é aceitável; não haverá migração de
+dados nem período de depreciação.
+
+### Atividade como entidade própria
+
+A tela de Saída apresenta "Atividade Relacionada" como um seletor de registros
+com descrição e data (Pulverização — 08/01/2025, Calagem — 02/07/2024, ...).
+Texto livre não suportaria isso. Decisão: criar a entidade `Atividade`
+(`id_atividade`, `descricao`, `data_atividade`, `status`) com `GET`/`POST`
+mínimos, e a movimentação de SAIDA referencia `id_atividade` (FK opcional).
+O campo `atividade_relacionada` (String) previsto na versão anterior desta
+proposta não será criado.
+
+### Campos condicionais em colunas nullable (tabela única)
+
+Os detalhes de entrada (fornecedor, NF, lote, datas) e de saída (talhão, safra,
+atividade, destino) ficam como colunas `nullable=True` na própria
+`movimentacao_estoque`, em vez de tabelas separadas por tipo. A exclusividade
+por tipo é garantida pelo schema Pydantic (`model_validator`): campos de
+entrada presentes em SAIDA (ou vice-versa) → 400. Alternativa descartada:
+herança/joined tables — complexidade desnecessária para dois tipos estáveis.
+
+`id_responsavel` dá lugar a `id_funcionario`, que permanece `nullable=True`
+no banco (a obrigatoriedade é regra da interface); `valor_unitario` entra como
+Numeric(14,2) opcional, permitindo registrar o custo da operação sem acoplar à
+precificação do insumo.
 
 ## Risks
 
