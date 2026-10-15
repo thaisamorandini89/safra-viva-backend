@@ -13,3 +13,4 @@ pydantic==2.7.1
 pandas
 openpyxl
 xlrd
+psycopg[binary]

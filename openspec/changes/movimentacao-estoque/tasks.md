@@ -62,3 +62,45 @@
 - [x] 5.4 Testar `GET /movimentacoes` com e sem filtro `id_insumo`.
 - [x] 5.5 Adicionar as requisições de Responsável e Movimentação ao
       `insomnia_safraviva.json` e remover dados de teste.
+
+## 6. Detalhes de Entrada e Saída (atualização da proposta)
+
+- [x] 6.0 Pré-requisito: garantir que a migration da tabela `funcionario`
+      está gerada e aplicada no banco (o modelo existe, mas a tabela não).
+- [x] 6.1 Adicionar ao modelo `MovimentacaoEstoque` os campos comuns/entrada
+      (todos nullable): `valor_unitario` Numeric(14,2), `id_fornecedor` FK →
+      `fornecedor.id_fornecedor`, `numero_nota_fiscal` String(50),
+      `numero_lote` String(50), `data_fabricacao` Date, `data_validade` Date.
+- [x] 6.2 Adicionar os campos de saída (todos nullable): `id_talhao` FK →
+      `talhao.id_talhao`, `safra` String(20), `id_atividade` FK →
+      `atividade.id_atividade`, `destino_finalidade` String(255).
+- [x] 6.3 Criar `models/atividade.py` (`id_atividade` PK, `descricao`
+      String(100) not null, `data_atividade` Date opcional, `status` Boolean
+      default True) e registrar em `models/__init__.py`.
+- [x] 6.4 Substituir `id_responsavel` por `id_funcionario` (FK →
+      `funcionario.id_funcionario`, nullable) no modelo da movimentação.
+- [x] 6.5 Remover a entidade `Responsavel`: modelo, import em
+      `models/__init__.py`, `services/responsavel_service.py`,
+      `controllers/responsavel_controller.py` e blueprint em `app.py`.
+- [x] 6.6 Gerar e aplicar a migration: criar `atividade`, alterar
+      `movimentacao_estoque` (novas colunas; `id_responsavel` →
+      `id_funcionario`) e dropar `responsavel`.
+- [x] 6.7 Criar `services/atividade_service.py` e
+      `controllers/atividade_controller.py` com `GET`/`POST /api/atividades`;
+      registrar o blueprint em `app.py`.
+- [x] 6.8 Atualizar `MovimentacaoCreate` com os novos campos opcionais
+      (`id_funcionario`, `id_atividade`, etc.) e validação cruzada: campos de
+      entrada rejeitados em SAIDA e campos de saída rejeitados em ENTRADA;
+      `data_validade >= data_fabricacao`.
+- [x] 6.9 No serviço, validar existência de `id_funcionario`, `id_fornecedor`,
+      `id_talhao` e `id_atividade` quando informados e persistir os campos.
+- [x] 6.10 Incluir os novos campos no retorno do `POST` e na listagem
+      (`funcionario_nome`, `fornecedor_nome`, `nome_talhao` e
+      `atividade_descricao` resolvidos por FK).
+- [x] 6.11 Atualizar o `insomnia_safraviva.json`: remover a pasta de
+      Responsáveis, adicionar Atividades e refazer os exemplos de
+      Entrada/Saída.
+- [x] 6.12 Testar: entrada completa (NF, lote, datas), saída completa (talhão,
+      safra, atividade, destino), campo de entrada em SAIDA → 400, campo de
+      saída em ENTRADA → 400, `data_validade` anterior à fabricação → 400,
+      funcionário/fornecedor/talhão/atividade inexistentes → 400.

@@ -27,13 +27,7 @@ def registrar_movimentacao():
 
         return jsonify({
             "message": "Movimentação registrada com sucesso!",
-            "id_movimentacao": movimentacao.id_movimentacao,
-            "id_insumo": movimentacao.id_insumo,
-            "tipo_movimentacao": movimentacao.tipo_movimentacao,
-            "quantidade": float(movimentacao.quantidade),
-            "id_responsavel": movimentacao.id_responsavel,
-            "observacao": movimentacao.observacao,
-            "estoque_atual": float(insumo.estoque_atual)
+            **MovimentacaoService.serializar(movimentacao, insumo.estoque_atual)
         }), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
