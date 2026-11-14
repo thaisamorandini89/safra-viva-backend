@@ -16,7 +16,10 @@ from controllers.fornecedor_controller import fornecedor_bp
 from controllers.produto_controller import produto_bp
 from controllers.insumo_controller import insumo_bp
 from controllers.marca_controller import marca_bp
-from controllers.atividade_controller import atividade_bp
+from controllers.categoria_atividade_controller import categoria_atividade_bp
+from controllers.tipo_atividade_controller import tipo_atividade_bp
+from controllers.maquina_controller import maquina_bp
+from controllers.atividade_agricola_controller import atividade_agricola_bp
 from controllers.movimentacao_controller import movimentacao_bp
 from controllers.funcionario_controller import funcionario_bp
 from controllers.safra_controller import safra_bp
@@ -61,7 +64,10 @@ app.register_blueprint(fornecedor_bp, url_prefix='/api')
 app.register_blueprint(produto_bp, url_prefix='/api')
 app.register_blueprint(insumo_bp, url_prefix='/api')
 app.register_blueprint(marca_bp, url_prefix='/api')
-app.register_blueprint(atividade_bp, url_prefix='/api')
+app.register_blueprint(atividade_agricola_bp, url_prefix='/api')
+app.register_blueprint(categoria_atividade_bp, url_prefix='/api')
+app.register_blueprint(tipo_atividade_bp, url_prefix='/api')
+app.register_blueprint(maquina_bp, url_prefix='/api')
 app.register_blueprint(movimentacao_bp, url_prefix='/api')
 app.register_blueprint(funcionario_bp, url_prefix='/api')
 app.register_blueprint(safra_bp, url_prefix='/api')
