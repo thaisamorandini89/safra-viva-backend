@@ -21,7 +21,12 @@ from .insumo import Insumo
 from .marca import Marca
 from .funcionario import Funcionario
 from .funcionario_propriedade import FuncionarioPropriedade
-from .atividade import Atividade
+from .categoria_atividade import CategoriaAtividade
+from .tipo_atividade import TipoAtividade
+from .maquina import Maquina
+from .atividade_agricola import AtividadeAgricola
+from .atividade_insumo import AtividadeInsumo
+from .atividade_maquina import AtividadeMaquina
 from .movimentacao_estoque import MovimentacaoEstoque
 from .safra import Safra
 from .centro_custo import CentroCusto

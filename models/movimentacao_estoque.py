@@ -51,7 +51,7 @@ class MovimentacaoEstoque(db.Model):
     safra = db.Column(db.String(20), nullable=True)
     id_atividade = db.Column(
         db.Integer,
-        db.ForeignKey('atividade.id_atividade'),
+        db.ForeignKey('tipo_atividade.id_atividade'),
         nullable=True
     )
     destino_finalidade = db.Column(db.String(255), nullable=True)

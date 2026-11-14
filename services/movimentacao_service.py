@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from models import db
-from models.atividade import Atividade
+from models.tipo_atividade import TipoAtividade as Atividade
 from models.fornecedor import Fornecedor
 from models.funcionario import Funcionario
 from models.insumo import Insumo
