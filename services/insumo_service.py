@@ -139,6 +139,14 @@ class InsumoService:
             raise ValueError(f"O campo '{campo}' possui um valor numérico inválido.")
 
     @staticmethod
+    def _validar_produto_livre(id_produto, id_insumo=None):
+        outro = Insumo.query.filter(
+            Insumo.id_produto == id_produto, Insumo.id_insumo != id_insumo
+        ).first()
+        if outro:
+            raise ValueError("O produto informado já tem insumo cadastrado.")
+
+    @staticmethod
     def _validar_propriedade(id_propriedade):
         if not id_propriedade:
             return None
@@ -194,6 +202,7 @@ class InsumoService:
             produto = Produto.query.get(id_produto)
             if not produto:
                 raise ValueError("Produto informado não foi encontrado.")
+            InsumoService._validar_produto_livre(id_produto)
         else:
             raise ValueError("O produto vinculado é obrigatório.")
 
@@ -270,6 +279,7 @@ class InsumoService:
             produto = Produto.query.get(dados.get("id_produto"))
             if not produto:
                 raise ValueError("Produto informado não foi encontrado.")
+            InsumoService._validar_produto_livre(dados.get("id_produto"), id_insumo)
             ins.id_produto = dados.get("id_produto")
 
         if dados.get("produto") is not None:

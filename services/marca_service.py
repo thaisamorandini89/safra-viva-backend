@@ -1,5 +1,6 @@
 from models import db
 from models.marca import Marca
+from models.produto import Produto
 
 
 class MarcaService:
@@ -73,6 +74,8 @@ class MarcaService:
         marca = Marca.query.get(id_marca)
         if not marca:
             raise LookupError("Marca não encontrada.")
+        if Produto.query.filter_by(id_marca=id_marca).first():
+            raise ValueError("A marca está em uso por produtos e não pode ser excluída.")
 
         db.session.delete(marca)
         MarcaService._commit("Erro ao excluir a marca")
