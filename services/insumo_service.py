@@ -1,3 +1,7 @@
+from decimal import Decimal
+
+from pydantic import ValidationError
+
 from models import db
 from models.atividade_insumo import AtividadeInsumo
 from models.insumo import Insumo
@@ -9,7 +13,12 @@ from models.categoria_insumo import CategoriaInsumo
 from models.fabricante import Fabricante
 from models.fornecedor import Fornecedor
 from models.marca import Marca
+from schemas.movimentacao_schema import MovimentacaoCreate
+from services.movimentacao_service import MovimentacaoService
 from services.produto_service import ProdutoService
+from utils.datas import hoje
+
+CAMPOS_ENTRADA_INICIAL = ("numero_lote", "data_fabricacao", "data_validade", "id_funcionario")
 
 
 class InsumoService:
@@ -138,6 +147,32 @@ class InsumoService:
         return id_propriedade
 
     @staticmethod
+    def _entrada_inicial(dados, quantidade):
+        """
+        Dados da entrada do estoque inicial (lote, datas e responsável), ou None
+        quando o insumo é cadastrado sem estoque.
+        """
+        detalhes = dados.get("entrada_inicial") or {}
+        if not isinstance(detalhes, dict):
+            raise ValueError("Os dados da entrada inicial são inválidos.")
+        informados = {
+            campo: detalhes[campo]
+            for campo in CAMPOS_ENTRADA_INICIAL
+            if detalhes.get(campo) not in (None, "")
+        }
+
+        if quantidade < 0:
+            raise ValueError("O estoque inicial não pode ser negativo.")
+        if quantidade == 0:
+            if informados:
+                raise ValueError(
+                    "Informe o estoque inicial para registrar o lote, as datas ou o "
+                    "responsável da entrada."
+                )
+            return None
+        return informados
+
+    @staticmethod
     def criar_insumo(dados):
         """
         Cria um novo Insumo (item de estoque) vinculado a um Produto existente
@@ -166,9 +201,12 @@ class InsumoService:
         estoque_atual = InsumoService._to_decimal(dados.get("estoque_atual"), "estoque_atual")
         estoque_minimo = InsumoService._to_decimal(dados.get("estoque_minimo"), "estoque_minimo")
         valor_unitario = InsumoService._to_decimal(dados.get("valor_unitario"), "valor_unitario")
+        quantidade_inicial = Decimal(str(estoque_atual or 0))
+        entrada_inicial = InsumoService._entrada_inicial(dados, quantidade_inicial)
 
+        # o saldo nasce zerado: o estoque inicial entra pela movimentação registrada abaixo
         novo_insumo = Insumo(
-            estoque_atual=estoque_atual if estoque_atual is not None else 0,
+            estoque_atual=0,
             estoque_minimo=estoque_minimo if estoque_minimo is not None else 0,
             valor_unitario=valor_unitario if valor_unitario is not None else 0,
             id_propriedade=id_propriedade,
@@ -181,7 +219,37 @@ class InsumoService:
                 db.session.flush()
             novo_insumo.id_produto = produto.id_produto
             db.session.add(novo_insumo)
+            if entrada_inicial is not None:
+                db.session.flush()
+                MovimentacaoService.aplicar(
+                    MovimentacaoCreate(
+                        id_insumo=novo_insumo.id_insumo,
+                        tipo_movimentacao="ENTRADA",
+                        quantidade=quantidade_inicial,
+                        valor_unitario=Decimal(str(novo_insumo.valor_unitario)),
+                        data_movimentacao=hoje(),
+                        id_fornecedor=produto.id_fornecedor,
+                        observacao="Estoque inicial do cadastro",
+                        **entrada_inicial,
+                    ),
+                    origem="CADASTRO",
+                )
             db.session.commit()
+        except ValidationError as e:
+            db.session.rollback()
+            erros = "; ".join(
+                ": ".join(
+                    parte for parte in (
+                        ".".join(str(p) for p in erro["loc"]),
+                        erro["msg"].removeprefix("Value error, "),
+                    ) if parte
+                )
+                for erro in e.errors()
+            )
+            raise ValueError(f"Dados da entrada inicial inválidos. {erros}")
+        except ValueError:
+            db.session.rollback()
+            raise
         except Exception as e:
             db.session.rollback()
             raise RuntimeError(f"Erro ao salvar o insumo no banco de dados: {str(e)}")
@@ -238,8 +306,9 @@ class InsumoService:
         if not ins:
             raise ValueError("Insumo não encontrado.")
 
+        movimentacoes = MovimentacaoEstoque.query.filter_by(id_insumo=id_insumo).all()
         em_uso = (
-            MovimentacaoEstoque.query.filter_by(id_insumo=id_insumo).first()
+            any(m.origem != "CADASTRO" for m in movimentacoes)
             or AtividadeInsumo.query.filter_by(id_insumo=id_insumo).first()
         )
         if em_uso:
@@ -248,8 +317,13 @@ class InsumoService:
                 "atividades e não pode ser excluído."
             )
 
-        db.session.delete(ins)
         try:
+            # só resta a entrada do estoque inicial: ela e o lote que criou saem junto
+            for movimentacao in movimentacoes:
+                db.session.delete(movimentacao)
+            db.session.flush()
+            LoteInsumo.query.filter_by(id_insumo=id_insumo).delete()
+            db.session.delete(ins)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
