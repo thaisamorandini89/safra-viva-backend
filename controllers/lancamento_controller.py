@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 
-from schemas.lancamento_schema import LancamentoCreate
+from schemas.lancamento_schema import ConciliacaoUpdate, LancamentoCreate
 from services.lancamento_service import LancamentoService, serializar_lancamento
+from utils.datas import data_do_parametro
 
 lancamento_bp = Blueprint('lancamento', __name__)
 
@@ -42,8 +43,8 @@ def criar_lancamento():
 def listar_lancamentos():
     try:
         filtros = {
-            "data_inicio": request.args.get('data_inicio'),
-            "data_fim": request.args.get('data_fim'),
+            "data_inicio": data_do_parametro(request.args.get('data_inicio'), 'data_inicio'),
+            "data_fim": data_do_parametro(request.args.get('data_fim'), 'data_fim'),
             "tipo": request.args.get('tipo'),
             "id_safra": request.args.get('id_safra', type=int),
             "id_propriedade": request.args.get('id_propriedade', type=int),
@@ -53,6 +54,8 @@ def listar_lancamentos():
             filtros["tipo"] = filtros["tipo"].strip().upper()
         lancamentos = LancamentoService.listar(filtros)
         return jsonify(lancamentos), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Erro ao listar os lançamentos.", "details": str(e)}), 500
 
@@ -74,6 +77,27 @@ def atualizar_lancamento(id_lancamento):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Falha ao atualizar o lançamento.", "details": str(e)}), 500
+
+
+@lancamento_bp.route('/lancamentos/<id_lancamento>/conciliacao', methods=['PUT'])
+def conciliar_lancamento(id_lancamento):
+    try:
+        try:
+            payload = ConciliacaoUpdate.model_validate(request.get_json(silent=True) or {})
+        except ValidationError:
+            return jsonify({"error": "Informe 'conciliado' como verdadeiro ou falso."}), 400
+
+        lancamento = LancamentoService.conciliar(id_lancamento, payload.conciliado)
+        return jsonify({
+            "message": "Lançamento conciliado." if lancamento.conciliado else "Conciliação desfeita.",
+            **serializar_lancamento(lancamento),
+        }), 200
+    except LookupError as e:
+        return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "Falha ao conciliar o lançamento.", "details": str(e)}), 500
 
 
 @lancamento_bp.route('/lancamentos/<id_lancamento>', methods=['DELETE'])
