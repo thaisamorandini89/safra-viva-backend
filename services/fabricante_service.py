@@ -1,8 +1,23 @@
+from sqlalchemy import func
+
 from models import db
 from models.fabricante import Fabricante
+from models.produto import Produto
+from utils.documentos import cnpj_digitos
 
 
 class FabricanteService:
+    @staticmethod
+    def _validar_nome(nome, id_fabricante=None):
+        nome = (nome or "").strip()
+        repetido = Fabricante.query.filter(
+            func.lower(Fabricante.nome_fabricante) == nome.lower(),
+            Fabricante.id_fabricante != id_fabricante,
+        ).first()
+        if repetido:
+            raise ValueError("Já existe um fabricante com este nome.")
+        return nome
+
     @staticmethod
     def listar_todos():
         fabricantes = Fabricante.query.order_by(Fabricante.nome_fabricante.asc()).all()
@@ -22,7 +37,7 @@ class FabricanteService:
     def buscar_por_id(id_fabricante):
         f = Fabricante.query.get(id_fabricante)
         if not f:
-            raise ValueError("Fabricante não encontrado.")
+            raise LookupError("Fabricante não encontrado.")
         for item in FabricanteService.listar_todos():
             if item["id_fabricante"] == f.id_fabricante:
                 return item
@@ -35,8 +50,8 @@ class FabricanteService:
             raise ValueError("O nome do fabricante é obrigatório.")
 
         novo = Fabricante(
-            nome_fabricante=nome.strip(),
-            cnpj=''.join(filter(str.isdigit, str(dados.get("cnpj") or ""))) or None,
+            nome_fabricante=FabricanteService._validar_nome(nome),
+            cnpj=cnpj_digitos(dados.get("cnpj")),
             telefone=(dados.get("telefone") or "").strip() or None,
             email=(dados.get("email") or "").strip() or None,
             website=(dados.get("website") or "").strip() or None,
@@ -54,15 +69,15 @@ class FabricanteService:
     def atualizar_fabricante(id_fabricante, dados):
         f = Fabricante.query.get(id_fabricante)
         if not f:
-            raise ValueError("Fabricante não encontrado.")
+            raise LookupError("Fabricante não encontrado.")
 
         if "nome_fabricante" in dados:
             nome = (dados.get("nome_fabricante") or "").strip()
             if not nome:
                 raise ValueError("O nome do fabricante não pode ficar vazio.")
-            f.nome_fabricante = nome
+            f.nome_fabricante = FabricanteService._validar_nome(nome, id_fabricante)
         if "cnpj" in dados:
-            f.cnpj = ''.join(filter(str.isdigit, str(dados.get("cnpj") or ""))) or None
+            f.cnpj = cnpj_digitos(dados.get("cnpj"))
         if "telefone" in dados:
             f.telefone = (dados.get("telefone") or "").strip() or None
         if "email" in dados:
@@ -85,7 +100,12 @@ class FabricanteService:
     def excluir_fabricante(id_fabricante):
         f = Fabricante.query.get(id_fabricante)
         if not f:
-            raise ValueError("Fabricante não encontrado.")
+            raise LookupError("Fabricante não encontrado.")
+        if Produto.query.filter_by(id_fabricante=id_fabricante).first():
+            raise ValueError(
+                "O fabricante está em uso por produtos e não pode ser excluído. "
+                "Inative-o se não for mais usar."
+            )
         db.session.delete(f)
         try:
             db.session.commit()

@@ -34,7 +34,7 @@ def criar_fabricante():
 def buscar_fabricante(id_fabricante):
     try:
         return jsonify(FabricanteService.buscar_por_id(id_fabricante)), 200
-    except ValueError as e:
+    except LookupError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         return jsonify({"error": "Erro ao carregar o fabricante.", "details": str(e)}), 500
@@ -52,9 +52,10 @@ def atualizar_fabricante(id_fabricante):
             "id_fabricante": f.id_fabricante,
             "nome_fabricante": f.nome_fabricante
         }), 200
+    except LookupError as e:
+        return jsonify({"error": str(e)}), 404
     except ValueError as e:
-        status = 404 if "não encontrado" in str(e).lower() else 400
-        return jsonify({"error": str(e)}), status
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Falha ao atualizar o fabricante.", "details": str(e)}), 500
 
@@ -64,7 +65,9 @@ def excluir_fabricante(id_fabricante):
     try:
         FabricanteService.excluir_fabricante(id_fabricante)
         return jsonify({"message": "Fabricante excluído com sucesso!"}), 200
-    except ValueError as e:
+    except LookupError as e:
         return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Falha ao excluir o fabricante.", "details": str(e)}), 500
