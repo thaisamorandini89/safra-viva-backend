@@ -65,6 +65,7 @@ def excluir(id_maquina):
         MaquinaService.excluir(id_maquina)
         return jsonify({"message": "Máquina excluída com sucesso!"}), 200
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        status = 404 if "não encontrada" in str(e).lower() else 400
+        return jsonify({"error": str(e)}), status
     except Exception as e:
         return jsonify({"error": "Falha ao excluir a máquina.", "details": str(e)}), 500

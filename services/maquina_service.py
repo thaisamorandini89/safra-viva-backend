@@ -1,4 +1,5 @@
 from models import db
+from models.atividade_maquina import AtividadeMaquina
 from models.maquina import Maquina
 
 
@@ -77,6 +78,10 @@ class MaquinaService:
         m = Maquina.query.get(id_maquina)
         if not m:
             raise ValueError("Máquina não encontrada.")
+        if AtividadeMaquina.query.filter_by(id_maquina=id_maquina).first():
+            raise ValueError(
+                "A máquina está em uso por atividades registradas e não pode ser excluída."
+            )
         db.session.delete(m)
         try:
             db.session.commit()

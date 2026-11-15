@@ -16,6 +16,7 @@ CAMPOS_SAIDA = (
     "id_talhao",
     "safra",
     "id_atividade",
+    "id_atividade_agricola",
     "destino_finalidade",
 )
 
@@ -27,6 +28,7 @@ class MovimentacaoCreate(BaseModel):
     tipo_movimentacao: Literal['ENTRADA', 'SAIDA']
     quantidade: Decimal = Field(gt=0)
     valor_unitario: Optional[Decimal] = Field(default=None, ge=0)
+    data_movimentacao: Optional[date] = None
     id_funcionario: Optional[str] = None
     observacao: Optional[str] = Field(default=None, max_length=500)
 
@@ -39,6 +41,7 @@ class MovimentacaoCreate(BaseModel):
     id_talhao: Optional[int] = None
     safra: Optional[str] = Field(default=None, max_length=20)
     id_atividade: Optional[int] = None
+    id_atividade_agricola: Optional[int] = None
     destino_finalidade: Optional[str] = Field(default=None, max_length=255)
 
     @field_validator('tipo_movimentacao', mode='before')
