@@ -22,6 +22,24 @@ class SafraCreate(BaseModel):
         return valor
 
 
+class SafraUpdate(BaseModel):
+    """Payload de edição de safra; só os campos enviados são alterados."""
+    nome: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    cultura: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    id_propriedade: Optional[int] = None
+    data_inicio: Optional[date] = None
+    data_fim: Optional[date] = None
+    area_plantada: Optional[Decimal] = Field(default=None, ge=0)
+    status: Optional[bool] = None
+
+    @field_validator('nome', 'cultura', mode='before')
+    @classmethod
+    def limpar_texto(cls, valor):
+        if isinstance(valor, str):
+            return valor.strip()
+        return valor
+
+
 class SafraOut(BaseModel):
     """Resposta de safra."""
     id_safra: int

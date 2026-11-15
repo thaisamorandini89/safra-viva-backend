@@ -374,8 +374,9 @@ ser recusado com HTTP 400.
 ### Requirement: Origem da movimentação
 
 O sistema SHALL informar em cada movimentação o campo `origem`, com o valor
-`ATIVIDADE` para as saídas geradas pela conclusão de uma operação agrícola e
-`MANUAL` para as demais. Toda movimentação registrada por
+`ATIVIDADE` para as saídas geradas pela conclusão de uma operação agrícola,
+`CADASTRO` para a entrada do estoque inicial registrada no cadastro de um
+insumo e `MANUAL` para as demais. Toda movimentação registrada por
 `POST /api/movimentacoes` SHALL ter origem `MANUAL`, independentemente do
 payload.
 
@@ -390,6 +391,12 @@ payload.
 - **WHEN** um `GET /api/movimentacoes` devolve movimentações registradas antes
   desta mudança
 - **THEN** elas vêm com `origem` igual a `MANUAL`
+
+#### Scenario: Entrada do estoque inicial
+
+- **WHEN** um `GET /api/movimentacoes` devolve a entrada registrada pelo
+  cadastro de um insumo com estoque inicial
+- **THEN** ela vem com `origem` igual a `CADASTRO`
 
 ### Requirement: Filtro do histórico por operação
 
