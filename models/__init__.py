@@ -28,6 +28,8 @@ from .atividade_agricola import AtividadeAgricola
 from .atividade_insumo import AtividadeInsumo
 from .atividade_maquina import AtividadeMaquina
 from .movimentacao_estoque import MovimentacaoEstoque
+from .lote_insumo import LoteInsumo
+from .movimentacao_lote import MovimentacaoLote
 from .safra import Safra
 from .centro_custo import CentroCusto
 from .lancamento_financeiro import LancamentoFinanceiro

@@ -21,7 +21,10 @@ class MovimentacaoEstoque(db.Model):
         nullable=False
     )
     tipo_movimentacao = db.Column(db.String(10), nullable=False)  # ENTRADA | SAIDA
-    quantidade = db.Column(db.Numeric(10, 2), nullable=False)
+    # MANUAL (lançada pela tela) | ATIVIDADE (gerada ao concluir uma operação)
+    origem = db.Column(db.String(10), nullable=False, default='MANUAL', server_default='MANUAL')
+    # mesma precisão do saldo do insumo e dos lotes, para a saída poder ser desfeita sem diferença
+    quantidade = db.Column(db.Numeric(14, 3), nullable=False)
     valor_unitario = db.Column(db.Numeric(14, 2), nullable=True)
     data_movimentacao = db.Column(db.DateTime, server_default=db.func.now())
     id_funcionario = db.Column(

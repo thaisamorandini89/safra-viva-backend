@@ -1,7 +1,4 @@
-import os
-from datetime import datetime
 from decimal import Decimal
-from zoneinfo import ZoneInfo
 
 from models import db
 from models.atividade_agricola import AtividadeAgricola
@@ -13,13 +10,11 @@ from models.talhao import Talhao
 from models.funcionario import Funcionario
 from models.maquina import Maquina
 from models.insumo import Insumo
+from models.movimentacao_estoque import MovimentacaoEstoque
 from models.produto import Produto
-
-FUSO = ZoneInfo(os.environ.get("APP_TIMEZONE", "America/Sao_Paulo"))
-
-
-def _hoje():
-    return datetime.now(FUSO).date()
+from schemas.movimentacao_schema import MovimentacaoCreate
+from services.movimentacao_service import MovimentacaoService
+from utils.datas import hoje
 
 
 def _num(v):
@@ -28,6 +23,13 @@ def _num(v):
 
 def _data(d):
     return d.strftime("%Y-%m-%d") if d else None
+
+
+def _quantidade(item):
+    """Quantidade do item na precisao do saldo do insumo."""
+    if item.quantidade is None:
+        return Decimal(0)
+    return Decimal(str(item.quantidade)).quantize(Decimal("0.001"))
 
 
 class AtividadeAgricolaService:
@@ -56,7 +58,27 @@ class AtividadeAgricolaService:
         if atv.status == "Concluída":
             return False
         prazo = atv.data_fim or atv.data_inicio
-        return bool(prazo and prazo < _hoje())
+        return bool(prazo and prazo < hoje())
+
+    @staticmethod
+    def _baixa_estoque(atv):
+        """Saidas geradas pela operacao e insumos que ficaram sem baixa por falta de saldo."""
+        pendentes = []
+        if atv.status == "Concluída":
+            for i in atv.insumos:
+                if i.id_movimentacao or _quantidade(i) <= 0:
+                    continue
+                insumo = Insumo.query.get(i.id_insumo)
+                pendentes.append({
+                    "id_insumo": i.id_insumo,
+                    "nome": i.nome,
+                    "quantidade": _num(i.quantidade),
+                    "disponivel": float(MovimentacaoService.saldo_utilizavel(insumo)),
+                })
+        return {
+            "geradas": sum(1 for i in atv.insumos if i.id_movimentacao),
+            "pendentes": pendentes,
+        }
 
     @staticmethod
     def serializar(atv):
@@ -94,9 +116,12 @@ class AtividadeAgricolaService:
                     "unidade": i.unidade,
                     "quantidade": _num(i.quantidade),
                     "custo": _num(i.custo),
+                    "baixado": i.id_movimentacao is not None,
+                    "id_movimentacao": i.id_movimentacao,
                 }
                 for i in atv.insumos
             ],
+            "baixa_estoque": AtividadeAgricolaService._baixa_estoque(atv),
             "maquinas": [
                 {
                     "id_maquina": m.id_maquina,
@@ -231,6 +256,63 @@ class AtividadeAgricolaService:
             ))
         return filhos
 
+    # ------------------------------------------------------------------ #
+    # Baixa de estoque da operacao concluida
+    # ------------------------------------------------------------------ #
+    @staticmethod
+    def _travar_insumos(ids):
+        """Trava os insumos em ordem de id, evitando bloqueio cruzado entre salvamentos."""
+        if ids:
+            (
+                Insumo.query
+                .filter(Insumo.id_insumo.in_(set(ids)))
+                .order_by(Insumo.id_insumo)
+                .with_for_update()
+                .all()
+            )
+
+    @staticmethod
+    def _desfazer_baixa(atv):
+        """Desfaz as saidas geradas pela operacao; as lancadas a mao permanecem."""
+        geradas = MovimentacaoEstoque.query.filter_by(
+            id_atividade_agricola=atv.id_atividade_agricola, origem="ATIVIDADE"
+        ).all()
+        for item in atv.insumos:
+            item.id_movimentacao = None
+        for movimentacao in geradas:
+            MovimentacaoService.desfazer(movimentacao)
+        db.session.flush()
+
+    @staticmethod
+    def _gerar_baixa(atv):
+        """
+        Gera a saida de cada insumo listado com quantidade. O insumo sem saldo
+        utilizavel suficiente fica sem saida (pendente); nao ha baixa parcial.
+        """
+        for item in atv.insumos:
+            quantidade = _quantidade(item)
+            if quantidade <= 0:
+                continue
+            insumo = Insumo.query.get(item.id_insumo)
+            if MovimentacaoService.saldo_utilizavel(insumo) < quantidade:
+                continue
+            movimentacao, _ = MovimentacaoService.aplicar(
+                MovimentacaoCreate(
+                    id_insumo=item.id_insumo,
+                    tipo_movimentacao="SAIDA",
+                    quantidade=quantidade,
+                    valor_unitario=insumo.valor_unitario,
+                    data_movimentacao=atv.data_fim,
+                    id_funcionario=atv.id_funcionario,
+                    id_talhao=atv.id_talhao,
+                    safra=atv.safra,
+                    id_atividade_agricola=atv.id_atividade_agricola,
+                    destino_finalidade="Aplicação na atividade",
+                ),
+                origem="ATIVIDADE",
+            )
+            item.id_movimentacao = movimentacao.id_movimentacao
+
     @staticmethod
     def _montar_maquinas(itens):
         filhos = []
@@ -271,7 +353,14 @@ class AtividadeAgricolaService:
 
         db.session.add(atv)
         try:
+            if atv.status == "Concluída":
+                db.session.flush()
+                AtividadeAgricolaService._travar_insumos([i.id_insumo for i in atv.insumos])
+                AtividadeAgricolaService._gerar_baixa(atv)
             db.session.commit()
+        except ValueError:
+            db.session.rollback()
+            raise
         except Exception as e:
             db.session.rollback()
             raise RuntimeError(f"Erro ao salvar a atividade: {str(e)}")
@@ -282,6 +371,15 @@ class AtividadeAgricolaService:
         atv = AtividadeAgricola.query.get(id_atividade_agricola)
         if not atv:
             raise ValueError("Atividade não encontrada.")
+
+        # operação que estava ou fica concluída: as saídas geradas são desfeitas aqui
+        # e geradas de novo no fim, conforme o estado final
+        if "Concluída" in (atv.status, dados.get("status")):
+            AtividadeAgricolaService._travar_insumos(
+                [i.id_insumo for i in atv.insumos]
+                + [i["id_insumo"] for i in dados.get("insumos") or []]
+            )
+            AtividadeAgricolaService._desfazer_baixa(atv)
 
         if "id_categoria_atividade" in dados and dados["id_categoria_atividade"] is not None:
             if not CategoriaAtividade.query.get(dados["id_categoria_atividade"]):
@@ -326,6 +424,8 @@ class AtividadeAgricolaService:
 
         try:
             AtividadeAgricolaService._validar_regras(atv)
+            if atv.status == "Concluída":
+                AtividadeAgricolaService._gerar_baixa(atv)
         except ValueError:
             db.session.rollback()
             raise
@@ -342,6 +442,8 @@ class AtividadeAgricolaService:
         atv = AtividadeAgricola.query.get(id_atividade_agricola)
         if not atv:
             raise ValueError("Atividade não encontrada.")
+        AtividadeAgricolaService._travar_insumos([i.id_insumo for i in atv.insumos])
+        AtividadeAgricolaService._desfazer_baixa(atv)
         db.session.delete(atv)
         try:
             db.session.commit()
