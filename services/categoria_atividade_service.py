@@ -1,5 +1,7 @@
 from models import db
+from models.atividade_agricola import AtividadeAgricola
 from models.categoria_atividade import CategoriaAtividade
+from models.tipo_atividade import TipoAtividade
 
 
 class CategoriaAtividadeService:
@@ -66,6 +68,15 @@ class CategoriaAtividadeService:
         cat = CategoriaAtividade.query.get(id_categoria_atividade)
         if not cat:
             raise ValueError("Categoria de atividade não encontrada.")
+        em_uso = (
+            TipoAtividade.query.filter_by(id_categoria_atividade=id_categoria_atividade).first()
+            or AtividadeAgricola.query.filter_by(id_categoria_atividade=id_categoria_atividade).first()
+        )
+        if em_uso:
+            raise ValueError(
+                "A categoria está em uso por tipos de atividade ou por atividades "
+                "registradas e não pode ser excluída."
+            )
         db.session.delete(cat)
         try:
             db.session.commit()

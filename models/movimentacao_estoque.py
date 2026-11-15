@@ -54,6 +54,11 @@ class MovimentacaoEstoque(db.Model):
         db.ForeignKey('tipo_atividade.id_atividade'),
         nullable=True
     )
+    id_atividade_agricola = db.Column(
+        db.Integer,
+        db.ForeignKey('atividade_agricola.id_atividade_agricola', ondelete='SET NULL'),
+        nullable=True
+    )
     destino_finalidade = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):

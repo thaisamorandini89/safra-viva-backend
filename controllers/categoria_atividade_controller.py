@@ -55,6 +55,7 @@ def excluir(id_categoria_atividade):
         CategoriaAtividadeService.excluir(id_categoria_atividade)
         return jsonify({"message": "Categoria de atividade excluída com sucesso!"}), 200
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        status = 404 if "não encontrada" in str(e).lower() else 400
+        return jsonify({"error": str(e)}), status
     except Exception as e:
         return jsonify({"error": "Falha ao excluir a categoria.", "details": str(e)}), 500

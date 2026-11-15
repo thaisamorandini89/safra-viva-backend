@@ -55,6 +55,7 @@ class AtividadeAgricola(db.Model):
     categoria = db.relationship('CategoriaAtividade', lazy='joined')
     tipo = db.relationship('TipoAtividade', lazy='joined')
     talhao = db.relationship('Talhao', lazy='joined')
+    propriedade = db.relationship('Propriedade', lazy='joined')
     funcionario = db.relationship('Funcionario', lazy='joined')
     insumos = db.relationship(
         'AtividadeInsumo',
