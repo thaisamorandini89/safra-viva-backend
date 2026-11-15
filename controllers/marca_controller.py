@@ -63,5 +63,7 @@ def excluir_marca(id_marca):
         return jsonify({"message": "Marca excluída com sucesso!"}), 200
     except LookupError as e:
         return jsonify({"error": str(e)}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Falha ao excluir a marca.", "details": str(e)}), 500

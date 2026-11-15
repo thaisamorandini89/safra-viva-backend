@@ -1026,6 +1026,150 @@
       "method": "GET",
       "url": "{{ _.base_url }}/financeiro/indicadores?agrupar_por=cultura",
       "metaSortKey": -150
+    },
+    {
+      "_id": "fld_fornecedor",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Fornecedores",
+      "metaSortKey": -149
+    },
+    {
+      "_id": "req_fornecedor_list",
+      "_type": "request",
+      "parentId": "fld_fornecedor",
+      "name": "Listar Fornecedores",
+      "method": "GET",
+      "url": "{{ _.base_url }}/fornecedores",
+      "metaSortKey": -148
+    },
+    {
+      "_id": "req_fornecedor_get",
+      "_type": "request",
+      "parentId": "fld_fornecedor",
+      "name": "Consultar Fornecedor",
+      "method": "GET",
+      "url": "{{ _.base_url }}/fornecedores/1",
+      "metaSortKey": -147
+    },
+    {
+      "_id": "req_fornecedor_create",
+      "_type": "request",
+      "parentId": "fld_fornecedor",
+      "name": "Criar Fornecedor",
+      "method": "POST",
+      "url": "{{ _.base_url }}/fornecedores",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome_fornecedor\": \"Agro Insumos Ltda\",\n  \"nome_fantasia\": \"Agro Insumos\",\n  \"cnpj\": \"11.222.333/0001-81\",\n  \"telefone\": \"(11) 99999-0000\",\n  \"email\": \"contato@agroinsumos.com.br\",\n  \"observacoes\": \"Entrega semanal\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -146
+    },
+    {
+      "_id": "req_fornecedor_update",
+      "_type": "request",
+      "parentId": "fld_fornecedor",
+      "name": "Atualizar Fornecedor",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/fornecedores/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"telefone\": \"(11) 98888-0000\",\n  \"status\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -145
+    },
+    {
+      "_id": "req_fornecedor_delete",
+      "_type": "request",
+      "parentId": "fld_fornecedor",
+      "name": "Excluir Fornecedor",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/fornecedores/1",
+      "metaSortKey": -144
+    },
+    {
+      "_id": "fld_fabricante",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Fabricantes",
+      "metaSortKey": -143
+    },
+    {
+      "_id": "req_fabricante_list",
+      "_type": "request",
+      "parentId": "fld_fabricante",
+      "name": "Listar Fabricantes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/fabricantes",
+      "metaSortKey": -142
+    },
+    {
+      "_id": "req_fabricante_get",
+      "_type": "request",
+      "parentId": "fld_fabricante",
+      "name": "Consultar Fabricante",
+      "method": "GET",
+      "url": "{{ _.base_url }}/fabricantes/1",
+      "metaSortKey": -141
+    },
+    {
+      "_id": "req_fabricante_create",
+      "_type": "request",
+      "parentId": "fld_fabricante",
+      "name": "Criar Fabricante",
+      "method": "POST",
+      "url": "{{ _.base_url }}/fabricantes",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome_fabricante\": \"Fertilizantes Brasil\",\n  \"cnpj\": \"11.222.333/0001-81\",\n  \"telefone\": \"(11) 3333-0000\",\n  \"email\": \"contato@fertbrasil.com.br\",\n  \"website\": \"https://fertbrasil.com.br\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -140
+    },
+    {
+      "_id": "req_fabricante_update",
+      "_type": "request",
+      "parentId": "fld_fabricante",
+      "name": "Atualizar Fabricante",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/fabricantes/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"website\": \"https://fertbrasil.com\",\n  \"status\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -139
+    },
+    {
+      "_id": "req_fabricante_delete",
+      "_type": "request",
+      "parentId": "fld_fabricante",
+      "name": "Excluir Fabricante",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/fabricantes/1",
+      "metaSortKey": -138
     }
   ]
 }

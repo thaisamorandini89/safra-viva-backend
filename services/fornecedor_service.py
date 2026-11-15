@@ -1,8 +1,22 @@
 from models import db
 from models.fornecedor import Fornecedor
+from models.movimentacao_estoque import MovimentacaoEstoque
+from models.produto import Produto
+from utils.documentos import cnpj_digitos
 
 
 class FornecedorService:
+    @staticmethod
+    def _validar_cnpj(valor, id_fornecedor=None):
+        cnpj = cnpj_digitos(valor)
+        if cnpj:
+            repetido = Fornecedor.query.filter(
+                Fornecedor.cnpj == cnpj, Fornecedor.id_fornecedor != id_fornecedor
+            ).first()
+            if repetido:
+                raise ValueError("Já existe um fornecedor com este CNPJ.")
+        return cnpj
+
     @staticmethod
     def listar_todos():
         fornecedores = Fornecedor.query.order_by(Fornecedor.nome_fornecedor.asc()).all()
@@ -23,7 +37,7 @@ class FornecedorService:
     def buscar_por_id(id_fornecedor):
         f = Fornecedor.query.get(id_fornecedor)
         if not f:
-            raise ValueError("Fornecedor não encontrado.")
+            raise LookupError("Fornecedor não encontrado.")
         for item in FornecedorService.listar_todos():
             if item["id_fornecedor"] == f.id_fornecedor:
                 return item
@@ -38,7 +52,7 @@ class FornecedorService:
         novo = Fornecedor(
             nome_fornecedor=nome.strip(),
             nome_fantasia=(dados.get("nome_fantasia") or "").strip() or None,
-            cnpj=''.join(filter(str.isdigit, str(dados.get("cnpj") or ""))) or None,
+            cnpj=FornecedorService._validar_cnpj(dados.get("cnpj")),
             telefone=(dados.get("telefone") or "").strip() or None,
             email=(dados.get("email") or "").strip() or None,
             id_logradouro=dados.get("id_logradouro") or None,
@@ -56,7 +70,7 @@ class FornecedorService:
     def atualizar_fornecedor(id_fornecedor, dados):
         f = Fornecedor.query.get(id_fornecedor)
         if not f:
-            raise ValueError("Fornecedor não encontrado.")
+            raise LookupError("Fornecedor não encontrado.")
 
         if "nome_fornecedor" in dados:
             nome = (dados.get("nome_fornecedor") or "").strip()
@@ -66,7 +80,7 @@ class FornecedorService:
         if "nome_fantasia" in dados:
             f.nome_fantasia = (dados.get("nome_fantasia") or "").strip() or None
         if "cnpj" in dados:
-            f.cnpj = ''.join(filter(str.isdigit, str(dados.get("cnpj") or ""))) or None
+            f.cnpj = FornecedorService._validar_cnpj(dados.get("cnpj"), id_fornecedor)
         if "telefone" in dados:
             f.telefone = (dados.get("telefone") or "").strip() or None
         if "email" in dados:
@@ -89,7 +103,16 @@ class FornecedorService:
     def excluir_fornecedor(id_fornecedor):
         f = Fornecedor.query.get(id_fornecedor)
         if not f:
-            raise ValueError("Fornecedor não encontrado.")
+            raise LookupError("Fornecedor não encontrado.")
+        em_uso = (
+            Produto.query.filter_by(id_fornecedor=id_fornecedor).first()
+            or MovimentacaoEstoque.query.filter_by(id_fornecedor=id_fornecedor).first()
+        )
+        if em_uso:
+            raise ValueError(
+                "O fornecedor está em uso por produtos ou movimentações de estoque e "
+                "não pode ser excluído. Inative-o se não for mais usar."
+            )
         db.session.delete(f)
         try:
             db.session.commit()
