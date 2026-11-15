@@ -78,9 +78,9 @@ class ProdutoService:
         return None
 
     @staticmethod
-    def criar_produto(dados):
+    def montar_produto(dados):
         """
-        Cria um novo Produto.
+        Valida os dados e devolve um Produto ainda não persistido.
         """
         nome = dados.get("nome_produto")
         id_categoria = dados.get("id_categoria_insumo")
@@ -120,6 +120,14 @@ class ProdutoService:
             ficha_tecnica=(dados.get("ficha_tecnica") or "").strip() or None,
             observacoes=(dados.get("observacoes") or "").strip() or None
         )
+        return novo_produto
+
+    @staticmethod
+    def criar_produto(dados):
+        """
+        Cria um novo Produto.
+        """
+        novo_produto = ProdutoService.montar_produto(dados)
 
         db.session.add(novo_produto)
         try:
@@ -140,6 +148,21 @@ class ProdutoService:
         if not prod:
             raise ValueError("Produto não encontrado.")
 
+        ProdutoService.aplicar_alteracoes(prod, dados)
+
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError(f"Erro ao atualizar o produto no banco de dados: {str(e)}")
+
+        return prod
+
+    @staticmethod
+    def aplicar_alteracoes(prod, dados):
+        """
+        Aplica ao produto os campos presentes em `dados`, sem persistir.
+        """
         if "nome_produto" in dados:
             nome = (dados.get("nome_produto") or "").strip()
             if not nome:
@@ -183,14 +206,6 @@ class ProdutoService:
             prod.observacoes = (dados.get("observacoes") or "").strip() or None
         if "status" in dados:
             prod.status = bool(dados.get("status"))
-
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise RuntimeError(f"Erro ao atualizar o produto no banco de dados: {str(e)}")
-
-        return prod
 
     @staticmethod
     def excluir_produto(id_produto):

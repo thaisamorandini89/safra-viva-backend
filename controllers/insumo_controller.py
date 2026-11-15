@@ -24,8 +24,7 @@ def criar_insumo():
 
         return jsonify({
             "message": "Insumo cadastrado com sucesso!",
-            "id_insumo": novo_insumo.id_insumo,
-            "id_produto": novo_insumo.id_produto
+            **InsumoService.buscar_por_id(novo_insumo.id_insumo)
         }), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -55,8 +54,7 @@ def atualizar_insumo(id_insumo):
 
         return jsonify({
             "message": "Insumo atualizado com sucesso!",
-            "id_insumo": insumo.id_insumo,
-            "id_produto": insumo.id_produto
+            **InsumoService.buscar_por_id(insumo.id_insumo)
         }), 200
     except ValueError as e:
         status = 404 if "não encontrado" in str(e).lower() else 400
@@ -71,6 +69,7 @@ def excluir_insumo(id_insumo):
         InsumoService.excluir_insumo(id_insumo)
         return jsonify({"message": "Insumo excluído com sucesso!"}), 200
     except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+        status = 404 if "não encontrado" in str(e).lower() else 400
+        return jsonify({"error": str(e)}), status
     except Exception as e:
         return jsonify({"error": "Falha ao excluir o insumo.", "details": str(e)}), 500
