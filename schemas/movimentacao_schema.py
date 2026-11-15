@@ -18,6 +18,7 @@ CAMPOS_SAIDA = (
     "id_atividade",
     "id_atividade_agricola",
     "destino_finalidade",
+    "id_lote",
 )
 
 
@@ -43,6 +44,7 @@ class MovimentacaoCreate(BaseModel):
     id_atividade: Optional[int] = None
     id_atividade_agricola: Optional[int] = None
     destino_finalidade: Optional[str] = Field(default=None, max_length=255)
+    id_lote: Optional[int] = None
 
     @field_validator('tipo_movimentacao', mode='before')
     @classmethod

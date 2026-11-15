@@ -1,6 +1,7 @@
 from models import db
 from models.atividade_insumo import AtividadeInsumo
 from models.insumo import Insumo
+from models.lote_insumo import LoteInsumo
 from models.movimentacao_estoque import MovimentacaoEstoque
 from models.produto import Produto
 from models.propriedade import Propriedade
@@ -12,6 +13,25 @@ from services.produto_service import ProdutoService
 
 
 class InsumoService:
+    @staticmethod
+    def _lotes(id_insumo):
+        lotes = (
+            LoteInsumo.query
+            .filter_by(id_insumo=id_insumo)
+            .order_by(LoteInsumo.data_validade.asc().nullslast(), LoteInsumo.id_lote)
+            .all()
+        )
+        return [
+            {
+                "id_lote": l.id_lote,
+                "numero_lote": l.numero_lote,
+                "data_fabricacao": l.data_fabricacao.strftime("%Y-%m-%d") if l.data_fabricacao else None,
+                "data_validade": l.data_validade.strftime("%Y-%m-%d") if l.data_validade else None,
+                "quantidade": float(l.quantidade),
+            }
+            for l in lotes
+        ]
+
     @staticmethod
     def listar_todos():
         """
@@ -77,6 +97,7 @@ class InsumoService:
                 "estoque_minimo": float(ins.estoque_minimo) if ins.estoque_minimo is not None else 0,
                 "valor_unitario": float(ins.valor_unitario) if ins.valor_unitario is not None else 0,
                 "status": ins.status,
+                "lotes": InsumoService._lotes(ins.id_insumo),
                 "data_cadastro": ins.data_cadastro.strftime("%Y-%m-%d %H:%M:%S") if ins.data_cadastro else None
             })
 

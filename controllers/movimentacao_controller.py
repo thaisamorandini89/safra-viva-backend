@@ -39,7 +39,10 @@ def registrar_movimentacao():
 def listar_movimentacoes():
     try:
         id_insumo = request.args.get('id_insumo', type=int)
-        movimentacoes = MovimentacaoService.listar(id_insumo=id_insumo)
+        id_atividade_agricola = request.args.get('id_atividade_agricola', type=int)
+        movimentacoes = MovimentacaoService.listar(
+            id_insumo=id_insumo, id_atividade_agricola=id_atividade_agricola
+        )
         return jsonify(movimentacoes), 200
     except Exception as e:
         return jsonify({"error": "Erro ao listar as movimentações.", "details": str(e)}), 500

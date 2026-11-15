@@ -20,6 +20,16 @@ class AtividadeInsumo(db.Model):
     unidade = db.Column(db.String(20), nullable=True)    # snapshot
     quantidade = db.Column(db.Numeric(14, 3), nullable=True)
     custo = db.Column(db.Numeric(14, 2), nullable=True)
+    # saída de estoque gerada para este item quando a operação está concluída
+    id_movimentacao = db.Column(
+        db.String(36),
+        db.ForeignKey(
+            'movimentacao_estoque.id_movimentacao',
+            name='atividade_insumo_id_movimentacao_fkey',
+            ondelete='SET NULL'
+        ),
+        nullable=True
+    )
 
     def __repr__(self):
         return f"<AtividadeInsumo insumo={self.id_insumo} qtd={self.quantidade}>"
