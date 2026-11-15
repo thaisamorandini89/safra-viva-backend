@@ -1,4 +1,6 @@
 from models import db
+from models.atividade_agricola import AtividadeAgricola
+from models.movimentacao_estoque import MovimentacaoEstoque
 from models.tipo_atividade import TipoAtividade
 from models.categoria_atividade import CategoriaAtividade
 
@@ -81,6 +83,15 @@ class TipoAtividadeService:
         t = TipoAtividade.query.get(id_atividade)
         if not t:
             raise ValueError("Tipo de atividade não encontrado.")
+        em_uso = (
+            AtividadeAgricola.query.filter_by(id_tipo_atividade=id_atividade).first()
+            or MovimentacaoEstoque.query.filter_by(id_atividade=id_atividade).first()
+        )
+        if em_uso:
+            raise ValueError(
+                "O tipo de atividade está em uso por atividades registradas ou por "
+                "movimentações de estoque e não pode ser excluído."
+            )
         db.session.delete(t)
         try:
             db.session.commit()

@@ -1,6 +1,8 @@
+from datetime import datetime
 from decimal import Decimal
 
 from models import db
+from models.atividade_agricola import AtividadeAgricola
 from models.tipo_atividade import TipoAtividade as Atividade
 from models.fornecedor import Fornecedor
 from models.funcionario import Funcionario
@@ -43,6 +45,21 @@ class MovimentacaoService:
             if not Atividade.query.get(dados.id_atividade):
                 raise ValueError("Atividade informada nao foi encontrada.")
 
+        id_atividade = dados.id_atividade
+        if dados.id_atividade_agricola is not None:
+            operacao = AtividadeAgricola.query.get(dados.id_atividade_agricola)
+            if not operacao:
+                raise ValueError("Atividade agricola informada nao foi encontrada.")
+            if id_atividade is not None and id_atividade != operacao.id_tipo_atividade:
+                raise ValueError(
+                    "O tipo de atividade informado nao corresponde ao da atividade agricola."
+                )
+            if dados.id_talhao is not None and dados.id_talhao != operacao.id_talhao:
+                raise ValueError(
+                    "O talhao informado nao corresponde ao da atividade agricola."
+                )
+            id_atividade = operacao.id_tipo_atividade
+
         quantidade = Decimal(dados.quantidade)
         saldo_atual = Decimal(insumo.estoque_atual or 0)
 
@@ -70,9 +87,15 @@ class MovimentacaoService:
             data_validade=dados.data_validade,
             id_talhao=dados.id_talhao,
             safra=dados.safra,
-            id_atividade=dados.id_atividade,
+            id_atividade=id_atividade,
+            id_atividade_agricola=dados.id_atividade_agricola,
             destino_finalidade=dados.destino_finalidade,
         )
+        if dados.data_movimentacao is not None:
+            # a coluna guarda hora UTC (padrao do banco); mantem a ordem dentro do dia
+            movimentacao.data_movimentacao = datetime.combine(
+                dados.data_movimentacao, datetime.utcnow().time()
+            )
 
         db.session.add(movimentacao)
         try:
@@ -113,8 +136,10 @@ class MovimentacaoService:
             "data_validade": mov.data_validade.strftime("%Y-%m-%d") if mov.data_validade else None,
             "id_talhao": mov.id_talhao,
             "nome_talhao": talhao.nome_talhao if talhao else "",
+            "codigo_talhao": talhao.codigo_talhao if talhao else None,
             "safra": mov.safra,
             "id_atividade": mov.id_atividade,
+            "id_atividade_agricola": mov.id_atividade_agricola,
             "atividade_descricao": atividade.descricao if atividade else "",
             "destino_finalidade": mov.destino_finalidade,
         }

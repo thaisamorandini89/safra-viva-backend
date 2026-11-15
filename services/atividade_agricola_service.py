@@ -1,5 +1,7 @@
-from datetime import date
+import os
+from datetime import datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 from models import db
 from models.atividade_agricola import AtividadeAgricola
@@ -12,6 +14,12 @@ from models.funcionario import Funcionario
 from models.maquina import Maquina
 from models.insumo import Insumo
 from models.produto import Produto
+
+FUSO = ZoneInfo(os.environ.get("APP_TIMEZONE", "America/Sao_Paulo"))
+
+
+def _hoje():
+    return datetime.now(FUSO).date()
 
 
 def _num(v):
@@ -48,7 +56,7 @@ class AtividadeAgricolaService:
         if atv.status == "Concluída":
             return False
         prazo = atv.data_fim or atv.data_inicio
-        return bool(prazo and prazo < date.today())
+        return bool(prazo and prazo < _hoje())
 
     @staticmethod
     def serializar(atv):
@@ -63,6 +71,7 @@ class AtividadeAgricolaService:
             "nome_talhao": atv.talhao.nome_talhao if atv.talhao else None,
             "codigo_talhao": atv.talhao.codigo_talhao if atv.talhao else None,
             "id_propriedade": atv.id_propriedade,
+            "nome_propriedade": atv.propriedade.nome_propriedade if atv.propriedade else None,
             "id_empresa": atv.id_empresa,
             "safra": atv.safra,
             "id_funcionario": atv.id_funcionario,
@@ -181,6 +190,31 @@ class AtividadeAgricolaService:
         return talhao
 
     @staticmethod
+    def _validar_regras(atv):
+        """Regras conferidas sobre o estado final da operação (criação e atualização)."""
+        with db.session.no_autoflush:
+            tipo = TipoAtividade.query.get(atv.id_tipo_atividade)
+            if tipo and tipo.id_categoria_atividade != atv.id_categoria_atividade:
+                raise ValueError("O tipo de atividade não pertence à categoria informada.")
+
+            if atv.status == "Concluída" and not atv.data_fim:
+                raise ValueError("Atividades concluídas precisam de data de término.")
+
+            duplicada = AtividadeAgricola.query.filter_by(
+                id_talhao=atv.id_talhao,
+                id_tipo_atividade=atv.id_tipo_atividade,
+                data_inicio=atv.data_inicio,
+            )
+            if atv.id_atividade_agricola is not None:
+                duplicada = duplicada.filter(
+                    AtividadeAgricola.id_atividade_agricola != atv.id_atividade_agricola
+                )
+            if duplicada.first():
+                raise ValueError(
+                    "Já existe uma atividade deste tipo para o mesmo talhão e data de início."
+                )
+
+    @staticmethod
     def _montar_insumos(itens):
         filhos = []
         for item in itens or []:
@@ -231,6 +265,7 @@ class AtividadeAgricolaService:
             custo_operacao=dados.get("custo_operacao"),
             observacoes=dados.get("observacoes"),
         )
+        AtividadeAgricolaService._validar_regras(atv)
         atv.insumos = AtividadeAgricolaService._montar_insumos(dados.get("insumos"))
         atv.maquinas = AtividadeAgricolaService._montar_maquinas(dados.get("maquinas"))
 
@@ -288,6 +323,12 @@ class AtividadeAgricolaService:
             atv.insumos = AtividadeAgricolaService._montar_insumos(dados.get("insumos"))
         if dados.get("maquinas") is not None:
             atv.maquinas = AtividadeAgricolaService._montar_maquinas(dados.get("maquinas"))
+
+        try:
+            AtividadeAgricolaService._validar_regras(atv)
+        except ValueError:
+            db.session.rollback()
+            raise
 
         try:
             db.session.commit()
