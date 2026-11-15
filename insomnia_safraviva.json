@@ -729,6 +729,303 @@
       "method": "GET",
       "url": "{{ _.base_url }}/funcionarios/COLE_O_ID_AQUI/propriedades",
       "metaSortKey": -187
+    },
+    {
+      "_id": "fld_safra",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Safras",
+      "metaSortKey": -185
+    },
+    {
+      "_id": "req_safra_list",
+      "_type": "request",
+      "parentId": "fld_safra",
+      "name": "Listar Safras",
+      "method": "GET",
+      "url": "{{ _.base_url }}/safras",
+      "metaSortKey": -184
+    },
+    {
+      "_id": "req_safra_list_prop",
+      "_type": "request",
+      "parentId": "fld_safra",
+      "name": "Listar Safras da Propriedade",
+      "method": "GET",
+      "url": "{{ _.base_url }}/safras?id_propriedade=1",
+      "metaSortKey": -183
+    },
+    {
+      "_id": "req_safra_create",
+      "_type": "request",
+      "parentId": "fld_safra",
+      "name": "Criar Safra",
+      "method": "POST",
+      "url": "{{ _.base_url }}/safras",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Safra 2026/2027\",\n  \"cultura\": \"Soja\",\n  \"id_propriedade\": 1,\n  \"data_inicio\": \"2026-09-01\",\n  \"data_fim\": \"2027-03-31\",\n  \"area_plantada\": 120.5\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -182
+    },
+    {
+      "_id": "req_safra_update",
+      "_type": "request",
+      "parentId": "fld_safra",
+      "name": "Atualizar Safra",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/safras/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cultura\": \"Milho\",\n  \"area_plantada\": 100,\n  \"status\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -181
+    },
+    {
+      "_id": "req_safra_delete",
+      "_type": "request",
+      "parentId": "fld_safra",
+      "name": "Excluir Safra",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/safras/1",
+      "metaSortKey": -180
+    },
+    {
+      "_id": "fld_centro_custo",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Centros de Custo",
+      "metaSortKey": -175
+    },
+    {
+      "_id": "req_centro_list",
+      "_type": "request",
+      "parentId": "fld_centro_custo",
+      "name": "Listar Centros de Custo",
+      "method": "GET",
+      "url": "{{ _.base_url }}/centros-custo",
+      "metaSortKey": -174
+    },
+    {
+      "_id": "req_centro_create",
+      "_type": "request",
+      "parentId": "fld_centro_custo",
+      "name": "Criar Centro de Custo",
+      "method": "POST",
+      "url": "{{ _.base_url }}/centros-custo",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Lavoura\",\n  \"tipo\": \"OPERACIONAL\",\n  \"descricao\": \"Custos diretos da lavoura\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -173
+    },
+    {
+      "_id": "req_centro_update",
+      "_type": "request",
+      "parentId": "fld_centro_custo",
+      "name": "Atualizar Centro de Custo",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/centros-custo/1",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Lavoura de Soja\",\n  \"status\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -172
+    },
+    {
+      "_id": "req_centro_delete",
+      "_type": "request",
+      "parentId": "fld_centro_custo",
+      "name": "Excluir Centro de Custo",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/centros-custo/1",
+      "metaSortKey": -171
+    },
+    {
+      "_id": "fld_lancamento",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Lançamentos Financeiros",
+      "metaSortKey": -165
+    },
+    {
+      "_id": "req_lanc_list",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Listar Lançamentos",
+      "method": "GET",
+      "url": "{{ _.base_url }}/lancamentos",
+      "metaSortKey": -164
+    },
+    {
+      "_id": "req_lanc_list_filtros",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Listar Lançamentos com Filtros",
+      "method": "GET",
+      "url": "{{ _.base_url }}/lancamentos?data_inicio=2026-01-01&data_fim=2026-12-31&tipo=DESPESA&id_safra=1",
+      "metaSortKey": -163
+    },
+    {
+      "_id": "req_lanc_create_receita",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Criar Receita",
+      "method": "POST",
+      "url": "{{ _.base_url }}/lancamentos",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"RECEITA\",\n  \"categoria\": \"Venda de Soja\",\n  \"data_lancamento\": \"2026-11-10\",\n  \"valor\": 15000,\n  \"descricao\": \"Venda de 100 sacas\",\n  \"forma_pagamento\": \"PIX\",\n  \"status\": \"PAGO\",\n  \"id_propriedade\": 1,\n  \"id_talhao\": 1,\n  \"id_safra\": 1\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -162
+    },
+    {
+      "_id": "req_lanc_create_rateio",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Criar Despesa com Rateio",
+      "method": "POST",
+      "url": "{{ _.base_url }}/lancamentos",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"DESPESA\",\n  \"categoria\": \"Fertilizantes\",\n  \"data_lancamento\": \"2026-11-12\",\n  \"valor\": 4000,\n  \"forma_pagamento\": \"BOLETO\",\n  \"id_safra\": 1,\n  \"id_centro_custo\": 1,\n  \"rateio\": [\n    { \"id_talhao\": 1, \"percentual\": 60 },\n    { \"id_talhao\": 2, \"percentual\": 40 }\n  ]\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -161
+    },
+    {
+      "_id": "req_lanc_update",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Atualizar Lançamento",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/lancamentos/COLE_O_ID_AQUI",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"DESPESA\",\n  \"categoria\": \"Fertilizantes\",\n  \"data_lancamento\": \"2026-11-12\",\n  \"valor\": 4200,\n  \"status\": \"PAGO\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -160
+    },
+    {
+      "_id": "req_lanc_conciliar",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Conciliar ou Desfazer Conciliação",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/lancamentos/COLE_O_ID_AQUI/conciliacao",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"conciliado\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -159
+    },
+    {
+      "_id": "req_lanc_delete",
+      "_type": "request",
+      "parentId": "fld_lancamento",
+      "name": "Excluir Lançamento",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/lancamentos/COLE_O_ID_AQUI",
+      "metaSortKey": -158
+    },
+    {
+      "_id": "fld_financeiro",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "Relatórios Financeiros",
+      "metaSortKey": -155
+    },
+    {
+      "_id": "req_fin_saldo",
+      "_type": "request",
+      "parentId": "fld_financeiro",
+      "name": "Saldo",
+      "method": "GET",
+      "url": "{{ _.base_url }}/financeiro/saldo?data_inicio=2026-01-01&data_fim=2026-12-31",
+      "metaSortKey": -154
+    },
+    {
+      "_id": "req_fin_fluxo",
+      "_type": "request",
+      "parentId": "fld_financeiro",
+      "name": "Fluxo de Caixa",
+      "method": "GET",
+      "url": "{{ _.base_url }}/financeiro/fluxo-caixa?data_inicio=2026-01-01&data_fim=2026-12-31",
+      "metaSortKey": -153
+    },
+    {
+      "_id": "req_fin_ind_safra",
+      "_type": "request",
+      "parentId": "fld_financeiro",
+      "name": "Indicadores por Safra",
+      "method": "GET",
+      "url": "{{ _.base_url }}/financeiro/indicadores?agrupar_por=safra",
+      "metaSortKey": -152
+    },
+    {
+      "_id": "req_fin_ind_talhao",
+      "_type": "request",
+      "parentId": "fld_financeiro",
+      "name": "Indicadores por Talhão",
+      "method": "GET",
+      "url": "{{ _.base_url }}/financeiro/indicadores?agrupar_por=talhao",
+      "metaSortKey": -151
+    },
+    {
+      "_id": "req_fin_ind_cultura",
+      "_type": "request",
+      "parentId": "fld_financeiro",
+      "name": "Indicadores por Cultura",
+      "method": "GET",
+      "url": "{{ _.base_url }}/financeiro/indicadores?agrupar_por=cultura",
+      "metaSortKey": -150
     }
   ]
 }

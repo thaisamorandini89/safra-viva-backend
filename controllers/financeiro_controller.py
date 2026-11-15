@@ -1,14 +1,15 @@
 from flask import Blueprint, request, jsonify
 
 from services.financeiro_service import FinanceiroService
+from utils.datas import data_do_parametro
 
 financeiro_bp = Blueprint('financeiro', __name__)
 
 
 def _filtros_saldo():
     return {
-        "data_inicio": request.args.get('data_inicio'),
-        "data_fim": request.args.get('data_fim'),
+        "data_inicio": data_do_parametro(request.args.get('data_inicio'), 'data_inicio'),
+        "data_fim": data_do_parametro(request.args.get('data_fim'), 'data_fim'),
         "id_propriedade": request.args.get('id_propriedade', type=int),
         "id_safra": request.args.get('id_safra', type=int),
     }
@@ -18,6 +19,8 @@ def _filtros_saldo():
 def saldo():
     try:
         return jsonify(FinanceiroService.saldo(_filtros_saldo())), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Erro ao calcular o saldo.", "details": str(e)}), 500
 
@@ -25,9 +28,11 @@ def saldo():
 @financeiro_bp.route('/financeiro/fluxo-caixa', methods=['GET'])
 def fluxo_caixa():
     try:
-        data_inicio = request.args.get('data_inicio')
-        data_fim = request.args.get('data_fim')
+        data_inicio = data_do_parametro(request.args.get('data_inicio'), 'data_inicio')
+        data_fim = data_do_parametro(request.args.get('data_fim'), 'data_fim')
         return jsonify(FinanceiroService.fluxo_caixa(data_inicio, data_fim)), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "Erro ao gerar o fluxo de caixa.", "details": str(e)}), 500
 

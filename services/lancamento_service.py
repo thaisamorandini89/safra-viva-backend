@@ -124,6 +124,11 @@ class LancamentoService:
         lancamento = LancamentoFinanceiro.query.get(id_lancamento)
         if not lancamento:
             raise LookupError("Lançamento não encontrado.")
+        if lancamento.conciliado:
+            raise ValueError(
+                "Lançamento conciliado não pode ser alterado. Desfaça a conciliação "
+                "antes de editar."
+            )
 
         _validar_vinculos(dados)
         _validar_rateio(dados)
@@ -156,6 +161,23 @@ class LancamentoService:
         except Exception as e:
             db.session.rollback()
             raise RuntimeError(f"Erro ao atualizar o lançamento: {str(e)}")
+        return lancamento
+
+    @staticmethod
+    def conciliar(id_lancamento, conciliado):
+        """Marca ou desfaz a conciliação; só lançamento pago pode ser conciliado."""
+        lancamento = LancamentoFinanceiro.query.get(id_lancamento)
+        if not lancamento:
+            raise LookupError("Lançamento não encontrado.")
+        if conciliado and lancamento.status != "PAGO":
+            raise ValueError("Só lançamentos pagos podem ser conciliados.")
+
+        lancamento.conciliado = conciliado
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError(f"Erro ao conciliar o lançamento: {str(e)}")
         return lancamento
 
     @staticmethod

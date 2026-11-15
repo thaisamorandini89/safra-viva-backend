@@ -2,7 +2,12 @@ from datetime import date
 from decimal import Decimal
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, StrictBool, field_validator
+
+
+class ConciliacaoUpdate(BaseModel):
+    """Payload para marcar ou desfazer a conciliação de um lançamento."""
+    conciliado: StrictBool
 
 
 class RateioItem(BaseModel):
