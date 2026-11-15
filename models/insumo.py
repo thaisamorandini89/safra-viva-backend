@@ -22,6 +22,12 @@ class Insumo(db.Model):
     estoque_minimo = db.Column(db.Numeric(14, 3), nullable=True, default=0)
     valor_unitario = db.Column(db.Numeric(14, 2), nullable=True, default=0)
 
+    id_propriedade = db.Column(
+        db.Integer,
+        db.ForeignKey('propriedade.id_propriedade'),
+        nullable=True
+    )
+
     # Controle
     status = db.Column(db.Boolean, default=True)
     data_cadastro = db.Column(db.DateTime, server_default=db.func.now())

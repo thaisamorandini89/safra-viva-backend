@@ -61,7 +61,9 @@ class AtividadeAgricola(db.Model):
         'AtividadeInsumo',
         backref='atividade',
         cascade='all, delete-orphan',
-        lazy='selectin'
+        lazy='selectin',
+        # sem isto, o item atualizado pela baixa de estoque muda de posição na lista
+        order_by='AtividadeInsumo.id'
     )
     maquinas = db.relationship(
         'AtividadeMaquina',
