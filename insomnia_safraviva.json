@@ -17,11 +17,13 @@
       "parentId": "wrk_safraviva",
       "name": "Base Environment",
       "data": {
-        "base_url": "http://localhost:5000/api"
+        "base_url": "http://localhost:5000/api",
+        "token": ""
       },
       "dataPropertyOrder": {
         "&": [
-          "base_url"
+          "base_url",
+          "token"
         ]
       },
       "metaSortKey": 1
@@ -1170,6 +1172,51 @@
       "method": "DELETE",
       "url": "{{ _.base_url }}/fabricantes/1",
       "metaSortKey": -138
+    },
+    {
+      "_id": "fld_safra_ia",
+      "_type": "request_group",
+      "parentId": "wrk_safraviva",
+      "name": "SafraIA",
+      "metaSortKey": -137
+    },
+    {
+      "_id": "req_safra_ia_profile",
+      "_type": "request",
+      "parentId": "fld_safra_ia",
+      "name": "Consultar perfil do SafraIA",
+      "method": "GET",
+      "url": "{{ _.base_url }}/safra-ia/perfil",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "metaSortKey": -136
+    },
+    {
+      "_id": "req_safra_ia_consult",
+      "_type": "request",
+      "parentId": "fld_safra_ia",
+      "name": "Consultar SafraIA",
+      "method": "POST",
+      "url": "{{ _.base_url }}/safra-ia/consultar",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pergunta\": \"Quantas propriedades minha fazenda tem?\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -135
     }
   ]
 }
