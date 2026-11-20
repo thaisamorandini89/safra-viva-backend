@@ -9,8 +9,13 @@ Flask-Migrate==4.0.7
 # Necessário para habilitar requisições do seu React para o Flask (evita erros de CORS)
 Flask-Cors==5.0.0
 # Validação de dados (opcional, mas recomendado)
-pydantic==2.7.1
+pydantic==2.14.4
 pandas
 openpyxl
 xlrd
 psycopg[binary]
+# Autenticação (JWT) e testes
+PyJWT==2.9.0
+pytest==8.3.3
+# LLM do SafraIA (Google Gemini)
+google-genai==3.6.1

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -26,19 +27,57 @@ from controllers.safra_controller import safra_bp
 from controllers.centro_custo_controller import centro_custo_bp
 from controllers.lancamento_controller import lancamento_bp
 from controllers.financeiro_controller import financeiro_bp
+from controllers.auth_controller import auth_bp
+from controllers.safra_ia_controller import safra_ia_bp
 
-def create_app():
+BLUEPRINTS = [
+    geo_bp,
+    empresa_bp,
+    regime_bp,
+    tipo_empresa_bp,
+    tipo_solo_bp,
+    classe_uso_bp,
+    propriedade_bp,
+    talhao_bp,
+    categoria_insumo_bp,
+    fabricante_bp,
+    fornecedor_bp,
+    produto_bp,
+    insumo_bp,
+    marca_bp,
+    atividade_agricola_bp,
+    categoria_atividade_bp,
+    tipo_atividade_bp,
+    maquina_bp,
+    movimentacao_bp,
+    funcionario_bp,
+    safra_bp,
+    centro_custo_bp,
+    lancamento_bp,
+    financeiro_bp,
+    auth_bp,
+    safra_ia_bp,
+]
+
+
+def create_app(config=None):
     app = Flask(__name__)
     
     # Configurações
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:senha_segura@db:5432/safra_db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET'] = os.environ.get('JWT_SECRET', 'dev-secret-troque-em-producao-com-32-chars')
+    if config:
+        app.config.update(config)
     
     # Inicialização das extensões
     CORS(app)
     db.init_app(app)
     migrate = Migrate(app, db)
     
+    for bp in BLUEPRINTS:
+        app.register_blueprint(bp, url_prefix='/api')
+
     # Rota de teste
     @app.route('/', methods=['GET'])
     def index():
@@ -48,32 +87,6 @@ def create_app():
 
 # Cria a instância da aplicação
 app = create_app()
-
-# REGISTRO DO BLUEPRINT (Obrigatório)
-app.register_blueprint(geo_bp, url_prefix='/api')
-app.register_blueprint(empresa_bp, url_prefix='/api')
-app.register_blueprint(regime_bp, url_prefix='/api')
-app.register_blueprint(tipo_empresa_bp, url_prefix='/api')
-app.register_blueprint(tipo_solo_bp, url_prefix='/api')
-app.register_blueprint(classe_uso_bp, url_prefix='/api')
-app.register_blueprint(propriedade_bp, url_prefix='/api')
-app.register_blueprint(talhao_bp, url_prefix='/api')
-app.register_blueprint(categoria_insumo_bp, url_prefix='/api')
-app.register_blueprint(fabricante_bp, url_prefix='/api')
-app.register_blueprint(fornecedor_bp, url_prefix='/api')
-app.register_blueprint(produto_bp, url_prefix='/api')
-app.register_blueprint(insumo_bp, url_prefix='/api')
-app.register_blueprint(marca_bp, url_prefix='/api')
-app.register_blueprint(atividade_agricola_bp, url_prefix='/api')
-app.register_blueprint(categoria_atividade_bp, url_prefix='/api')
-app.register_blueprint(tipo_atividade_bp, url_prefix='/api')
-app.register_blueprint(maquina_bp, url_prefix='/api')
-app.register_blueprint(movimentacao_bp, url_prefix='/api')
-app.register_blueprint(funcionario_bp, url_prefix='/api')
-app.register_blueprint(safra_bp, url_prefix='/api')
-app.register_blueprint(centro_custo_bp, url_prefix='/api')
-app.register_blueprint(lancamento_bp, url_prefix='/api')
-app.register_blueprint(financeiro_bp, url_prefix='/api')
 
 if __name__ == '__main__':
     # O host 0.0.0.0 é obrigatório dentro de containers Docker
