@@ -34,3 +34,4 @@ from .safra import Safra
 from .centro_custo import CentroCusto
 from .lancamento_financeiro import LancamentoFinanceiro
 from .rateio_lancamento import RateioLancamento
+from .usuario import Usuario
